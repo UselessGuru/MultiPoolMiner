@@ -1,9 +1,10 @@
-#### This is the home of the MultiPoolMiner beta versions
+# This is the home of the MultiPoolMiner beta versions
 
 ## Changelog Version 3.4.0 Beta 1
 
-### Breaking changes
-**Parameter '-UseDeviceNameForStatsFileNaming:false' will be removed in 3.4.0, '-UseDeviceNameForStatsFileNaming:true will be enforced**
+#### Breaking changes
+**Parameter '-UseDeviceNameForStatsFileNaming:false' will be removed in 3.4.0
+'-UseDeviceNameForStatsFileNaming:true will be enforced**
 This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true'
 
 #### Core changes
