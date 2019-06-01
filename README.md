@@ -6,7 +6,7 @@
 **Parameter '-UseDeviceNameForStatsFileNaming:false' will be removed in 3.4.0**
 **'-UseDeviceNameForStatsFileNaming:true will be enforced**
 
-This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true'
+This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
 
 #### Core changes
 - API: updated to version 0.93; added '/alldevices'
