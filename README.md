@@ -5,6 +5,7 @@
 #### Breaking changes
 **Parameter '-UseDeviceNameForStatsFileNaming:false' will be removed in 3.4.0
 '-UseDeviceNameForStatsFileNaming:true will be enforced**
+
 This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true'
 
 #### Core changes
