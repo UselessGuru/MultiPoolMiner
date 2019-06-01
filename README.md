@@ -1,4 +1,5 @@
 # This is the home of the MultiPoolMiner beta versions
+https://github.com/MultiPoolMiner/MultiPoolMiner
 
 ## Changelog Version 3.4.0 Beta 1
 
