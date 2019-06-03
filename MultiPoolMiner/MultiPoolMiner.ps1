@@ -88,8 +88,6 @@ param(
     [Parameter(Mandatory = $false)]
     [Switch]$CreateMinerInstancePerDeviceModel = $false, #if true MPM will create separate miner instances per device model. This will improve profitability.
     [Parameter(Mandatory = $false)]
-    [Switch]$UseDeviceNameForStatsFileNaming = $false, #if true the benchmark files will be named like 'NVIDIA-CryptoDredge_v16.0-2xGTX1080Ti_Lyra2RE2_HashRate'. This will keep benchmarks files valid even when the order of the cards are changed in your rig
-    [Parameter(Mandatory = $false)]
     [String]$ConfigFile = ".\Config.txt", #default config file
     [ValidateRange(5, 20)]
     [Int]$HashRateSamplesPerInterval = 10, #approx number of hashrate samples that MPM will collect per interval (higher numbers produce more exact numbers, but use more CPU cycles and memory). Allowed values: 5 - 20
@@ -140,7 +138,7 @@ param(
 
 Clear-Host
 
-$Version = "3.4.0 Beta 1"
+$Version = "3.4.0 Beta 2"
 $VersionCompatibility = "3.3.0"
 $Strikes = 3
 $SyncWindow = 5 #minutes
@@ -168,6 +166,7 @@ $WatchdogTimers = @()
 
 $ActiveMiners = @()
 $RunningMiners = @()
+$AllMinerPaths = @()
 
 $NewPools_JobsDurations = @()
 
@@ -234,7 +233,7 @@ while (-not $API.Stop) {
 
     #Load the configuration
     $OldConfig = $Config | ConvertTo-Json -Depth 10 | ConvertFrom-Json
-    $Config = Get-ChildItemContent $ConfigFile -Parameters $Config_Parameters | Select-Object -ExpandProperty Content
+    $Config = Get-ChildItemContent $ConfigFile -Parameters $Config_Parameters | Select-Object -ExpandProperty Content | Sort-Object
     if ($Config -isnot [PSCustomObject]) {
         Write-Log -Level Error "Config file ($ConfigFile) is not a valid configuration file (JSON structure is broken). Cannot continue. "
         Start-Sleep 10
@@ -298,7 +297,7 @@ while (-not $API.Stop) {
             $Miner.StatusMessage = " stopped gracefully (initiated by API port change)"
             $RunningMiners = @($RunningMiners | Where-Object {$_ -ne $Miner}) 
         }
-        Get-CIMInstance CIM_Process | Where-Object ExecutablePath | Where-Object {$_.ExecutablePath -like "$(Get-Location)\Bin\*"} | Select-Object -ExpandProperty ProcessID | ForEach-Object {Stop-Process -Id $_ -Force -ErrorAction Ignore}
+        Get-CIMInstance CIM_Process | Where-Object ExecutablePath | Where-Object {$AllMinerPaths -contains $_.ExecutablePath} | Select-Object -ExpandProperty ProcessID | ForEach-Object {Stop-Process -Id $_ -Force -ErrorAction Ignore}
         try {
             Invoke-WebRequest -Uri "http://localhost:$($API.Port)/stopapi" -Timeout 1 -ErrorAction SilentlyContinue | Out-Null
         }
@@ -320,7 +319,7 @@ while (-not $API.Stop) {
                 Remove-Variable API -ErrorAction SilentlyContinue
                 Start-APIServer -Port $Config.APIPort
                 if ($API.Port) {
-                    Write-Log -Level Info "Web dashboard and API (version $($API.APIVersion)) are up and running on http://localhost:$($API.Port). "
+                    Write-Log -Level Info "Web dashboard and API (version $($API.APIVersion)) running on http://localhost:$($API.Port). "
                     $API.Version = [PSCustomObject]@{
                         "Core" = $Version
                         "API" = $API.APIVersion
@@ -576,12 +575,10 @@ while (-not $API.Stop) {
             #Strip Model information from devices -> will create only one miner instance
             if ($Config.CreateMinerInstancePerDeviceModel) {$DevicesTmp = $Devices} else {$DevicesTmp = $Devices | ConvertTo-Json -Depth 10 | ConvertFrom-Json; $DevicesTmp | ForEach-Object {$_.Model = ""}}
             Get-ChildItemContent "MinersLegacy" -Parameters @{Pools = $Pools; Stats = $Stats; Config = $Config; Devices = $DevicesTmp; JobName = "MinersLegacy"} | ForEach-Object {
-                $_.Content | Add-Member Name $_.Name -PassThru -Force} | 
-                Where-Object {$_.DeviceName} | #filter miners for non-present hardware
+                $_.Content | Add-Member Name $_.Name -PassThru -Force; $_.Content.Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($_.Content.Path); $AllMinerPaths += $_.Content.Path} | 
                 Where-Object {(Compare-Object $Pools.PSObject.Properties.Name $_.HashRates.PSObject.Properties.Name | Where-Object SideIndicator -EQ "=>" | Measure-Object).Count -eq 0} | 
                 Where-Object {$UnprofitableAlgorithms -notcontains (($_.HashRates.PSObject.Properties.Name | Select-Object -Index 0) -replace 'NiceHash'<#temp fix#>)} | #filter unprofitable algorithms, allow them as secondary algo
                 Where-Object {-not $Config.SingleAlgoMining -or @($_.HashRates.PSObject.Properties.Name).Count -EQ 1} | #filter dual algo miners
-                Where-Object {(Compare-Object @($Devices.Name | Select-Object) @($_.DeviceName | Select-Object) | Where-Object SideIndicator -EQ "=>" | Measure-Object).Count -eq 0} | 
                 Where-Object {$Config.MinerName.Count -eq 0 -or (Compare-Object @($Config.MinerName | Select-Object) @($_.BaseName, $_.Name | Select-Object -Unique) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
                 Where-Object {$Config.ExcludeMinerName.Count -eq 0 -or (Compare-Object @($Config.ExcludeMinerName | Select-Object) @($_.BaseName, $_.Name | Select-Object -Unique) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} |
                 Where-Object {-not $Config.DisableMinersWithDevFee -or (-not $_.Fees.PSObject.Properties.Value)} |
@@ -592,6 +589,8 @@ while (-not $API.Stop) {
                 ForEach-Object {if ($_.WarmupTime -eq $null) {$_ | Add-Member WarmupTime $Config.WarmupTime -Force}; $_} #default WarmupTime is taken from config file
         }
     )
+    $AllMinerPaths  = $AllMinerPaths | Sort-Object -Unique
+
     #Retrieve collected balance data
     if ($Balances_Jobs) {
         $Balances = @($Balances_Jobs | Receive-Job -Wait -AutoRemoveJob -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Content | Sort-Object Name)
@@ -746,7 +745,6 @@ while (-not $API.Stop) {
         $Miner | Add-Member PowerCost $Miner_PowerCost -Force
         $Miner | Add-Member PowerUsage $Miner_PowerUsage -Force
 
-        $Miner.Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Miner.Path)
         if ($Miner.PrerequisitePath) {$Miner.PrerequisitePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Miner.PrerequisitePath)}
 
         if ($Miner.Arguments -isnot [String]) {$Miner.Arguments = $Miner.Arguments | ConvertTo-Json -Depth 10 -Compress}
@@ -1006,8 +1004,9 @@ while (-not $API.Stop) {
     Start-Sleep $Config.Delay #Wait to prevent BSOD
 
     #Kill stray miners
-    Get-CIMInstance CIM_Process | Where-Object ExecutablePath | Where-Object {$_.ExecutablePath -like "$(Get-Location)\Bin\*"} | Where-Object {$ActiveMiners.ProcessID -notcontains $_.ProcessID} | Select-Object -ExpandProperty ProcessID | ForEach-Object {Stop-Process -Id $_ -Force -ErrorAction Ignore}
-    $API.FailedMiners = $FailedMiners = $null
+    Get-CIMInstance CIM_Process | Where-Object ExecutablePath | Where-Object {$AllMinerPaths -contains $_.ExecutablePath} | Where-Object {$ActiveMiners.ProcessID -notcontains $_.ProcessID} | Select-Object -ExpandProperty ProcessID | ForEach-Object {Stop-Process -Id $_ -Force -ErrorAction Ignore}
+    $FailedMiners = $null
+    if ($API.FailedMiners) {$API.FailedMiners = $null} 
     $RunningMiners = @($ActiveMiners | Where-Object Best | Where-Object {$_.GetStatus() -eq "Running"})
 
     #Start miners in the active list depending on if they are the most profitable
@@ -1048,7 +1047,7 @@ while (-not $API.Stop) {
                 }
             }
         }
-        if ($Miner.Algorithm | Where-Object {-not (Get-Stat -Name "$($Miner.Name)_$($_)_HashRate")}) {
+        if ($Miner.Speed -contains $null) {
             Write-Log -Level Warn "Benchmarking miner ($($Miner.Name) {$(($Miner.Algorithm | ForEach-Object {"$($_)@$($Pools.$_.Name)"}) -join "; ")})$(if ($Miner.IntervalMultiplier -gt 1) {" requires extended benchmark duration (Benchmarking interval $($_.IntervalCount + 1)/$($_.IntervalMultiplier))"}) [Attempt $($_.GetActivateCount()) of max. $Strikes]. "
         }
         else {
