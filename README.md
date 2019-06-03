@@ -13,6 +13,7 @@ This will trigger all Benchmarks to be re-executed (unless you were running MPM 
 - Removed code for '-UseDeviceNameForStatsFileNaming'
 
 #### Miner Changes
+- Removed code for '-UseDeviceNameForStatsFileNaming'
 - Updated AMD_NVIDIA-GminerEquihash_v1.45
 - Updated AMD_NVIDIA-NanoMiner_v1.3.3
 - Updated NVIDIA-CryptoDredge_v0.20.1
