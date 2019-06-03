@@ -9,8 +9,9 @@ https://github.com/MultiPoolMiner/MultiPoolMiner
 This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
 
 #### Core changes
-- Web dashboard: Added algorithm information to device status
+- Fixed Start cmd files (missing ")
 - Removed code for '-UseDeviceNameForStatsFileNaming'
+- Web dashboard: Added algorithm information to device status
 
 #### Miner Changes
 - Removed code for '-UseDeviceNameForStatsFileNaming'
