@@ -7,7 +7,7 @@
 
 ###### Licensed under the GNU General Public License v3.0 - Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/LICENSE
 
-README.md is based on README.txt - updated on 31/05/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
+README.md is based on README.txt - updated on 01/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
 
 
 
@@ -291,10 +291,6 @@ Specifying the *-SSL* command (without a boolean value of true or false) will re
 **-SwitchingPrevention**
 Since version 2.6, the delta value (integer) that was used to determine how often MultiPoolMiner is allowed to switch, is now user-configurable on a scale of 1 to infinity on an intensity basis. Default is 1 (Start.bat default is 2). Recommended values are 1-10 where 1 means the most frequent switching and 10 means the least switching. Please note setting this value to zero (0) will not turn this function off! Please see further explanation in MULTIPOOLMINER'S LOGIC section below. 
 
-**-UseDeviceNameForStatsFileNaming** (recommended, enabled by default with MPM version 3.2 and later)
-Include this command to use the device model as part of the stat file names. This keeps benchmark results valid when new cards of a different model are added or when the the order of the cards are change. 
-E.g. CcminerNevermore-GPU#00-GPU#02_Lyra2z_HashRate.txt -> NVIDIA-CcminerNevermore-2xGtx1080ti_Lyra2z_HashRate.txt
-
 **-UserName**
 Your username you use to login to MiningPoolHub.
 
@@ -440,7 +436,6 @@ Warning: The JSON file structure is very fragile - every comma counts, so be car
   "SingleAlgoMining": "$SingleAlgoMining",
   "SSL": "$SSL",
   "SwitchingPrevention": "$SwitchingPrevention",
-  "UseDeviceNameForStatsFileNaming": true,
   "UserName": "$UserName",
   "Verbose": "$Verbose",
   "Wallet": "$Wallet",
@@ -874,17 +869,6 @@ To display the balances of all pools (including those that are excluded with *-E
       ...
     }
 Note: Only balances in BTC are listed, other currencies are currently not supported.
-
-#### Miner speed stats file naming
-Beginning with MPM 3.1 all miners definition files support an alternate naming scheme for miner speed stat files. They will use the device model as part of the file name. This keeps benchmark results valid when new cards of a different model are added or when the the order of the cards are change. E.g. CcminerNevermore-GPU#00-GPU#02_Lyra2z_HashRate.txt -> NVIDIA-CcminerNevermore-2xGtx1080ti_Lyra2z_HashRate.txt
-To use this alternate naming scheme add '"UseDeviceNameForStatsFileNaming": true' to the general section:
-    {
-      ...
-      "SwitchingPrevention":  "$SwitchingPrevention",
-      "UseDeviceNameForStatsFileNaming": true,
-      ...
-    }	
-Note: MPM Version 3.3.0 adds this as default value when creating a new config file.
 
 
 ## UNPROFITABLE ALGORITHMS

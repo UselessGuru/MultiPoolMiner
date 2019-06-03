@@ -1,13 +1,23 @@
 # This is the home of the MultiPoolMiner beta versions
 https://github.com/MultiPoolMiner/MultiPoolMiner
 
-## Changelog Version 3.4.0 Beta 1
+## Changelog Version 3.4.0 Beta 2
 
 ### Breaking changes
-**Parameter '-UseDeviceNameForStatsFileNaming:false' will be removed in 3.4.0**
-**'-UseDeviceNameForStatsFileNaming:true will be enforced**
 
+**Parameter '-UseDeviceNameForStatsFileNaming' in no longer valid**
 This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
+
+#### Core changes
+- Web dashboard: Added algorithm information to device status
+- Removed code for '-UseDeviceNameForStatsFileNaming'
+
+#### Miner Changes
+- Updated AMD_NVIDIA-GminerEquihash_v1.45
+- Updated AMD_NVIDIA-NanoMiner_v1.3.3
+- Updated NVIDIA-CryptoDredge_v0.20.1
+
+## Changelog Version 3.4.0 Beta 1
 
 #### Core changes
 - API: updated to version 0.93; added '/alldevices'
