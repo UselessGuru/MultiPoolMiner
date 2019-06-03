@@ -78,12 +78,7 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
         $Threads = $_.Threads
 
         if ($Miner_Device = @($Device | Where-Object {([math]::Round((10 * $_.OpenCL.GlobalMemSize / 1GB), 0) / 10) -ge $MinMemGB})) {
-            if ($Config.UseDeviceNameForStatsFileNaming) {
-                $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
-            }
-            else {
-                $Miner_Name = (@($Name) + @($Miner_Device.Name | Sort-Object) | Select-Object) -join '-'
-            }
+            $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | Sort-Object Name | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm($(($Miner_Device | Sort-Object Name | Where-Object Model_Norm -eq $Model_Norm).Name -join ';'))"} | Select-Object) -join '_') | Select-Object) -join '-'
 
             #Get parameters for active miner devices
             if ($Miner_Config.Parameters.$Algorithm_Norm) {
@@ -96,8 +91,8 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
                 $Parameters = Get-ParameterPerDevice $Parameters $Miner_Device.Type_Vendor_Index
             }
 
-            $ConfigFileName = "GpuConf_$($Miner_Device.count)x$($Miner_Device.Model_Norm | Sort-Object -unique)-$Algorithm_Norm-$($Pools.$Algorithm_Norm.User)-$($Pools.$Algorithm_Norm.Pass).json"
-            $PoolFileName = "PoolConf_$($Pools.$Algorithm_Norm.Name)-$($Algorithm_Norm).json"
+            $ConfigFileName = "$((@("GpuConf") + @(($Miner_Device.Model_Norm | Sort-Object -unique | Sort-Object Name | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm($(($Miner_Device | Sort-Object Name | Where-Object Model_Norm -eq $Model_Norm).Name -join ';'))"} | Select-Object) -join '_') + @($Algorithm_Norm) + @($Pools.$Algorithm_Norm.User) + @($Pools.$Algorithm_Norm.Pass) | Select-Object) -join '-').txt"
+            $PoolFileName = "$((@("PoolConf") + @($Pools.$Algorithm_Norm.Name) + @($Algorithm_Norm) + @($Pools.$Algorithm_Norm.User) + @($Pools.$Algorithm_Norm.Pass) | Select-Object) -join '-').txt"
             $Arguments = [PSCustomObject]@{
                 ConfigFile = [PSCustomObject]@{
                     FileName = $ConfigFileName

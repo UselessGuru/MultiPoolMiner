@@ -9,8 +9,8 @@ param(
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
 $Path = ".\Bin\$($Name)\nanominer.exe"
-$HashSHA256 = "9F15FBD4D09C74692589537787BD741382DAA714108767CEC45025B075DB2F6D"
-$Uri = "https://github.com/nanopool/nanominer/releases/download/v1.3.2/nanominer-windows-1.3.2.zip"
+$HashSHA256 = "970338B20B8C46B79C6BF0F5D4865D656215830F93189E87D9361BB75712D629"
+$Uri = "https://github.com/nanopool/nanominer/releases/download/v1.3.3/nanominer-windows-1.3.3.zip"
 $ManualUri = "https://github.com/nanopool/nanominer/releases"
 
 $Miner_Version = Get-MinerVersion $Name
@@ -60,12 +60,7 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
         $Parameters = $_.Parameters
 
         if ($Miner_Device = @($Device | Where-Object {([math]::Round((10 * $_.OpenCL.GlobalMemSize / 1GB), 0) / 10) -ge $MinMemGB})) {
-            if ($Config.UseDeviceNameForStatsFileNaming) {
-                $Miner_Name = "$Name-$($Miner_Device.count)x$($Miner_Device.Model_Norm | Sort-Object -unique)"
-            }
-            else {
-                $Miner_Name = (@($Name) + @($Miner_Device.Name | Sort-Object) | Select-Object) -join '-'
-            }
+            $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
 
             #Get parameters for active miner devices
             if ($Miner_Config.Parameters.$Algorithm_Norm) {
@@ -77,8 +72,7 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
             else {
                 $Parameters = Get-ParameterPerDevice $_.Parameters $Miner_Device.Type_Vendor_Index
             }
-
-            $ConfigFileName = "Config_$($Miner_Device.count)x$($Miner_Device.Model_Norm | Sort-Object -unique)-$Algorithm_Norm-$Miner_Port-$($Pools.$Algorithm_Norm.User)-$($Pools.$Algorithm_Norm.Pass).ini"
+            $ConfigFileName = "$((@("Config") + @($Algorithm_Norm) + @(($Miner_Device.Model_Norm | Sort-Object -unique | Sort-Object Name | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm($(($Miner_Device | Sort-Object Name | Where-Object Model_Norm -eq $Model_Norm).Name -join ';'))"} | Select-Object) -join '_') + @($Algorithm_Norm) + @($Miner_Port) + @($Pools.$Algorithm_Norm.User) + @($Pools.$Algorithm_Norm.Pass)| Select-Object) -join '-').ini"
             $Arguments = [PSCustomObject]@{
                 ConfigFile = [PSCustomObject]@{
                     FileName = $ConfigFileName
