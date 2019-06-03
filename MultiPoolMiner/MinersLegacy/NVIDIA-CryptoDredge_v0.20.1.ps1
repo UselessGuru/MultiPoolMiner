@@ -26,13 +26,13 @@ if ($CUDAVersion -and [System.Version]$CUDAVersion -lt [System.Version]$Required
     return
 }
 
-if ($CUDAVersion -lt [System.Version]("10.0.0")) {
-    $HashSHA256 = "EA8EC1A8A730E666897FCD4A348E20DEEA44CFA1936091928D2CF544C8ABC16B"
-    $Uri = "https://github.com/technobyl/CryptoDredge/releases/download/v0.19.1/CryptoDredge_0.19.1_cuda_9.2_windows.zip"
+if ($CUDAVersion -lt [System.Version]("10.1.0")) {
+    $HashSHA256 = "098C1E2056D21B8C9B15F5F9F87E8C06FD758AF12A8E90CB04E3100AB919CAB4"
+    $Uri = "https://github.com/technobyl/CryptoDredge/releases/download/v0.20.1/CryptoDredge_0.20.1_cuda_9.2_windows.zip"
 }
 else {
-    $HashSHA256 = "D3CA3F94CBA1ED4E69FDE8D8E3FC36169A27E5C071B36FC8CC28F1D246D0AF85"
-    $Uri = "https://github.com/technobyl/CryptoDredge/releases/download/v0.19.1/CryptoDredge_0.19.1_cuda_10.0_windows.zip"
+    $HashSHA256 = "21B81A2D62B9D22564A5520D5E1F5F356B04CE850D32957BF893F119FF1ADA7B"
+    $Uri = "https://github.com/technobyl/CryptoDredge/releases/download/v0.20.1/CryptoDredge_0.20.1_cuda_10.1_windows.zip"
 }
 
 #Commands from config file take precedence
@@ -91,16 +91,11 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
         $Parameters = $_.Parameters
 
         if ($Miner_Device = @($Device | Where-Object {([math]::Round((10 * $_.OpenCL.GlobalMemSize / 1GB), 0) / 10) -ge $MinMemGB})) {
-            if ($Config.UseDeviceNameForStatsFileNaming) {
-                $Miner_Name = "$Name-$($Miner_Device.count)x$($Miner_Device.Model_Norm | Sort-Object -unique)"
-            }
-            else {
-                $Miner_Name = (@($Name) + @($Miner_Device.Name | Sort-Object) | Select-Object) -join '-'
-            }
+            $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
 
             #Get parameters for active miner devices
             if ($Miner_Config.Parameters.$Algorithm_Norm) {
-                $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters.$Algorithm_Norm $Miner_Device.Type_Vendor_Index $Config
+                $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters.$Algorithm_Norm $Miner_Device.Type_Vendor_Index
             }
             elseif ($Miner_Config.Parameters."*") {
                 $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters."*" $Miner_Device.Type_Vendor_Index

@@ -47,12 +47,13 @@
     "Iq":  "IqCash",
     "Joule":  "JouleCoin",
     "Lbry.Io":  "LbryCredits",
+    "LiteCoinZ":  "LiteCoinZ"
     "Lucky":  "Luckybit",
     "Lux":  "LuxCoin",
     "Machine":  "MachineCoin",
     "Magi":  "MagiCoin",
-    "Microbit":  "MicroBitcoin",
-    "MicrobitCoin":  "MicroBitcoin",
+    "Microbit":  "MicroBitCoin",
+    "MicrobitCoin":  "MicroBitCoin",
     "Minex":  "MinexCoin",
     "Mkt":  "MktCoin",
     "Max":  "MaxCoin",
@@ -122,6 +123,5 @@
     "ZelCash":  "ZelCash",
     "Zero":  "ZeroCoin",
     "ZeroCoin":  "ZeroCoin",
-    "Zur":  "ZurCoin",
-    "LiteCoinZ":  "LiteCoinZ"
+    "Zur":  "ZurCoin"
 }

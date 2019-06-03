@@ -15,7 +15,7 @@ class Fireice : Miner {
             try {
                 $Parameters = $this.Arguments | ConvertFrom-Json
                 $ConfigFile = "$(Split-Path $this.Path)\$($Parameters.ConfigFile.FileName)"
-                $PoolsFile = "$(Split-Path $this.Path)\$($Parameters.PoolsFile.FileName)"
+                $PoolFile = "$(Split-Path $this.Path)\$($Parameters.PoolFile.FileName)"
                 $MinerThreadsConfigFile = "$(Split-Path $this.Path)\$($Parameters.MinerThreadsConfigFile)"
                 $ThreadsConfigFile = "$(Split-Path $this.Path)\$($Parameters.ThreadsConfigFile)"
                 $Platform = $Parameters.Platform
@@ -23,7 +23,7 @@ class Fireice : Miner {
                 $ThreadsConfig = ""
 
                 #Write pool config file, overwrite every time
-                ($Parameters.PoolsFile.Content | ConvertTo-Json -Depth 10) -replace '^{' -replace '}$', ',' | Set-Content $PoolsFile -Force
+                ($Parameters.PoolFile.Content | ConvertTo-Json -Depth 10) -replace '^{' -replace '}$', ',' | Set-Content $PoolFile -Force
                 #Write config file, keep existing file to preserve user custom config
                 if (-not (Test-Path $ConfigFile -PathType Leaf)) {($Parameters.ConfigFile.Content | ConvertTo-Json -Depth 10) -replace '^{' -replace '}$' | Set-Content $ConfigFile}
 

@@ -154,6 +154,8 @@
     "equihashbtg":  "Equihash1445",
     "espers":  "HMQ1725",
     "eth":  "Ethash",
+    "ethash2gb":  "Ethash2GB",
+    "ethash3gb":  "Ethash3GB",
     "ether1":  "Ethash2GB",
     "ethereum":  "Ethash",
     "ethereumclassic":  "Ethash",

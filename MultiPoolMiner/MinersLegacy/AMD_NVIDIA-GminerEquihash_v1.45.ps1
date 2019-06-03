@@ -9,8 +9,8 @@ param(
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
 $Path = ".\Bin\$($Name)\miner.exe"
-$HashSHA256 = "A224FD406671ACB5CE3E263769CB341FEB20D5F87976EDED92711B689BC51702"
-$Uri = "https://github.com/develsoftware/GMinerRelease/releases/download/1.44/gminer_1_44_windows64.zip"
+$HashSHA256 = "96E69A1ED88A3A8FBEFC81EBFBFAB9C7F4528363E9A40DC5644755B02BD24095"
+$Uri = "https://github.com/develsoftware/GMinerRelease/releases/download/1.45/gminer_1_45_windows64.zip"
 $ManualUri = "https://bitcointalk.org/index.php?topic=5034735.0"
 
 $Miner_Version = Get-MinerVersion $Name
@@ -54,12 +54,7 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
 
         if ($Miner_Device = @($Device | Where-Object {([math]::Round((10 * $_.OpenCL.GlobalMemSize / 1GB), 0) / 10) -ge $MinMemGB})) {
             if ($Miner_Device.Vendor -contains "NVIDIA Corporation" -or $Algorithm -notmatch "cuckatoo31|equihash96_5|equihash192_7|equihash210_9") {
-                if ($Config.UseDeviceNameForStatsFileNaming) {
-                    $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
-                }
-                else {
-                    $Miner_Name = (@($Name) + @($Miner_Device.Name | Sort-Object) | Select-Object) -join '-'
-                }
+                $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
 
                 #Get parameters for active miner devices
                 if ($Miner_Config.Parameters.$Algorithm_Norm) {
