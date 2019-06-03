@@ -47,9 +47,15 @@ function Update-APIDeviceStatus {
 
     $API.AllDevices | ForEach-Object {
         if ($Devices.Name -contains $_.Name) {
-            if ($Miner = $API.FailedMiners | Where-Object DeviceName -contains $_.Name) {$_ | Add-Member Status "Failed ($(($Miner.BaseName, $Miner.Version | Select-Object) -join '_'))" -Force}
-            elseif ($Miner = $API.MinersNeedingBenchmark | Where-Object DeviceName -contains $_.Name) {$_ | Add-Member Status "Benchmarking ($(($Miner.BaseName, $Miner.Version | Select-Object) -join '_'))" -Force}
-            elseif ($Miner = $API.RunningMiners | Where-Object DeviceName -contains $_.Name) {$_ | Add-Member Status "Running ($(($Miner.BaseName, $Miner.Version | Select-Object) -join '_'))" -Force}
+            if ($Miner = $API.FailedMiners | Where-Object DeviceName -contains $_.Name) {$_ | Add-Member Status "Failed ($(($Miner.BaseName, $Miner.Version | Select-Object) -join '_') [$($Miner.Algorithm -join '; ')])" -Force}
+            elseif ($Miner = $API.RunningMiners | Where-Object DeviceName -contains $_.Name) {
+                if ($Miner.Speed -contains $null) {
+                    $_ | Add-Member Status "Benchmarking ($(($Miner.BaseName, $Miner.Version | Select-Object) -join '_') [$($Miner.Algorithm -join '; ')])" -Force
+                }
+                else {
+                    $_ | Add-Member Status "Running ($(($Miner.BaseName, $Miner.Version | Select-Object) -join '_') [$($Miner.Algorithm -join '; ')])" -Force
+                }
+            }
             else {$_ | Add-Member Status "Idle" -Force}
         }
         else {$_ | Add-Member Status "Disabled" -Force}
@@ -338,16 +344,21 @@ function Get-ParameterPerDevice {
 function Write-Log {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateNotNullOrEmpty()][Alias("LogContent")][string]$Message,
-        [Parameter(Mandatory = $false)][ValidateSet("Error", "Warn", "Info", "Verbose", "Debug")][string]$Level = "Info"
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [Alias("LogContent")]
+        [string]$Message,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Error", "Warn", "Info", "Verbose", "Debug")]
+        [string]$Level = "Info"
     )
 
     Begin { }
     Process {
         # Inherit the same verbosity settings as the script importing this
-        if (-not $PSBoundParameters.ContainsKey('InformationPreference')) { $InformationPreference = $PSCmdlet.GetVariableValue('InformationPreference') }
-        if (-not $PSBoundParameters.ContainsKey('Verbose')) { $VerbosePreference = $PSCmdlet.GetVariableValue('VerbosePreference') }
-        if (-not $PSBoundParameters.ContainsKey('Debug')) { $DebugPreference = $PSCmdlet.GetVariableValue('DebugPreference') }
+        if (-not $PSBoundParameters.ContainsKey('InformationPreference')) {$InformationPreference = $PSCmdlet.GetVariableValue('InformationPreference')}
+        if (-not $PSBoundParameters.ContainsKey('Verbose')) {$VerbosePreference = $PSCmdlet.GetVariableValue('VerbosePreference')}
+        if (-not $PSBoundParameters.ContainsKey('Debug')) {$DebugPreference = $PSCmdlet.GetVariableValue('DebugPreference')}
 
         # Get mutex named MPMWriteLog. Mutexes are shared across all threads and processes.
         # This lets us ensure only one thread is trying to write to the file at a time.
@@ -450,7 +461,7 @@ function Set-Stat {
             $Stat.ToleranceExceeded ++
             if ($Stat.ToleranceExceeded -lt 3) {
                 if ($Name -match ".+_HashRate$") {
-                    Write-Log -Level Warn "Stat file ($Name) was not updated because the value ($($Value | ConvertTo-Hash)) is outside fault tolerance ($($ToleranceMin | ConvertTo-Hash) to $($ToleranceMax | ConvertTo-Hash)) [$($Stat.ToleranceExceeded) of 3 until enforced update]. "
+                    Write-Log -Level Warn "Stat file ($Name) was not updated because the value ($(($Value | ConvertTo-Hash) -replace '\s+', '')) is outside fault tolerance ($(($ToleranceMin | ConvertTo-Hash) -replace '\s+', ' ') to $(($ToleranceMax | ConvertTo-Hash) -replace '\s+', ' ')) [$($Stat.ToleranceExceeded) of 3 until enforced update]. "
                 }
                 else {
                     Write-Log -Level Warn "Stat file ($Name) was not updated because the value ($($Value.ToString("N2"))W) is outside fault tolerance ($($ToleranceMin.ToString("N2"))W to $($ToleranceMax.ToString("N2"))W) [$($Stat.ToleranceExceeded) of 3 until enforced update]. "
@@ -461,7 +472,7 @@ function Set-Stat {
         if (($Value -ge $ToleranceMin -and $Value -le $ToleranceMax) -or ($Stat.ToleranceExceeded -ge 3)) {
             if ($Stat.ToleranceExceeded -ge 3) {
                 if ($Name -match ".+_HashRate$") {
-                    Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($($Value | ConvertTo-Hash)) because it was outside fault tolerance ($($ToleranceMin | ConvertTo-Hash) to $($ToleranceMax | ConvertTo-Hash)) for $($Stat.ToleranceExceeded) times in a row. "
+                    Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($(($Value | ConvertTo-Hash) -replace '\s+', '')) because it was outside fault tolerance ($(($ToleranceMin | ConvertTo-Hash) -replace '\s+', ' ')) to $(($ToleranceMax | ConvertTo-Hash) -replace '\s+', ' ')) for $($Stat.ToleranceExceeded) times in a row. "
                 }
                 else {
                     Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($($Value.ToString("N2"))W) because it was outside fault tolerance ($($ToleranceMin.ToString("N2"))W to $($ToleranceMax.ToString("N2"))W) for $($Stat.ToleranceExceeded) times in a row. "
@@ -1234,10 +1245,6 @@ class Miner {
     $WarmupTime
     $AllowedBadShareRatio
     $StatusMessage
-
-    [String[]]GetProcessNames() {
-        return @(([IO.FileInfo]($this.Path | Split-Path -Leaf -ErrorAction Ignore)).BaseName)
-    }
 
     [String]GetCommandLineParameters() {
         return $this.Arguments
