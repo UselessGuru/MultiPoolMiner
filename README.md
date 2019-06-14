@@ -16,6 +16,7 @@ https://github.com/MultiPoolMiner/MultiPoolMiner
 - Updated AMD-TeamRed_v0.5.1; support for X16r, X16s & X16rt
 - Updated AMD-WildRig_v0.17.5; support for Blake2b-BTCC & Blake2b-Glt
 - Updated NVIDIA-CcminerTrex_v0.11.1
+- Updated NVIDIA-NBMiner_v23.3
 
 ### Breaking changes
 
