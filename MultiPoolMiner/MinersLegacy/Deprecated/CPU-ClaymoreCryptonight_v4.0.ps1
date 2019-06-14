@@ -41,13 +41,13 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
 
         #Get parameters for active miner devices
         if ($Miner_Config.Parameters.$Algorithm_Norm) {
-            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters.$Algorithm_Norm $Miner_Device.Type_Vendor_Index
+            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters.$Algorithm_Norm $Miner_Device.PCIBus_Type_Vendor_Index
         }
         elseif ($Miner_Config.Parameters."*") {
-            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters."*" $Miner_Device.Type_Vendor_Index
+            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters."*" $Miner_Device.PCIBus_Type_Vendor_Index
         }
         else {
-            $Parameters = Get-ParameterPerDevice $Commands.$_ $Miner_Device.Type_Vendor_Index
+            $Parameters = Get-ParameterPerDevice $Commands.$_ $Miner_Device.PCIBus_Type_Vendor_Index
         }
 
         [PSCustomObject]@{
