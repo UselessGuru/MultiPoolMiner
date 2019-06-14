@@ -26,8 +26,9 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 ## Changelog Version 3.4.0 Beta 2
 
 #### Core changes
-- Web dashboard: Added algorithm information to device status
+- Fixed Start cmd files (missing ")
 - Removed code for '-UseDeviceNameForStatsFileNaming'
+- Web dashboard: Added algorithm information to device status
 
 #### Miner changes
 - Removed code for '-UseDeviceNameForStatsFileNaming'

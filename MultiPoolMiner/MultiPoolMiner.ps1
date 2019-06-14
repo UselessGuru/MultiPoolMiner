@@ -430,7 +430,7 @@ while (-not $API.Stop) {
 
     #Power cost preparations
     $PowerPrice = [Double]0
-    $PowerPriceDigits = 0
+    $PowerPriceDigits = (Get-Culture).NumberFormat.CurrencyDecimalDigits
     $PowerCostBTCperW = [Double]0
     $BasePowerCost = [Double]0
     if ($Config.MeasurePowerUsage) {
@@ -640,7 +640,6 @@ while (-not $API.Stop) {
             $Config.PowerPrices | Add-Member "00:00" ($Config.PowerPrices.($Config.PowerPrices | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Sort-Object | Select-Object -Last 1))
         }
         $PowerPrice = [Double]($Config.PowerPrices.($Config.PowerPrices | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Sort-Object | Where-Object {$_ -lt (Get-Date -Format HH:mm).ToString()} | Select-Object -Last 1))
-        $PowerPriceDigits = ($Config.PowerPrices.($Config.PowerPrices | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Sort-Object | Where-Object {$_ -lt (Get-Date -Format HH:mm).ToString()} | Select-Object -Last 1)).ToString().Split(".")[1].Length
     }
     if ($Rates.BTC.$FirstCurrency) {
         if ($API) {$API.BTCRateFirstCurrency = $Rates.BTC.$FirstCurrency}
@@ -917,8 +916,8 @@ while (-not $API.Stop) {
     $ActiveMiners | ForEach-Object {$_.Profit_Bias += $SmallestProfitBias; $_.Profit_Comparison += $SmallestProfitComparison} 
 
     #Get most profitable miner combination i.e. AMD+NVIDIA+CPU
-    $BestMiners = @($ActiveMiners | Select-Object DeviceName -Unique | ForEach-Object {$Miner_GPU = $_; ($ActiveMiners | Where-Object {(Compare-Object $Miner_GPU.DeviceName $_.DeviceName | Measure-Object).Count -eq 0 -and $_.Profit -ne 0} | Sort-Object -Descending {($_ | Where-Object Profit -EQ $null | Measure-Object).Count}, {$(if ($_.Profit -eq $null) {$_.IntervalMultiplier} else {0})}, {$Config.MeasurePowerUsage -and $_.Profit -ne $null -and $_.PowerUsage -eq $null}, {$_.Profit_Bias}, {$_ | Where-Object Profit -NE 0}, {$_.IntervalCount} | Select-Object -First 1)})
-    $BestMiners_Comparison = @($ActiveMiners | Select-Object DeviceName -Unique | ForEach-Object {$Miner_GPU = $_; ($ActiveMiners | Where-Object {(Compare-Object $Miner_GPU.DeviceName $_.DeviceName | Measure-Object).Count -eq 0 -and $_.Profit -ne 0} | Sort-Object -Descending {($_ | Where-Object Profit -EQ $null | Measure-Object).Count}, {$(if ($_.Profit -eq $null) {$_.IntervalMultiplier} else {0})}, {$Config.MeasurePowerUsage -and $_.Profit -ne $null -and $_.PowerUsage -eq $null}, {$_.Profit_Comparison}, {$_ | Where-Object Profit -NE 0}, {$_.IntervalCount} | Select-Object -First 1)})
+    $BestMiners = @($ActiveMiners | Select-Object DeviceName -Unique | ForEach-Object {$Miner_GPU = $_; ($ActiveMiners | Where-Object {(Compare-Object $Miner_GPU.DeviceName $_.DeviceName | Measure-Object).Count -eq 0 -and $_.Earning -ne 0} | Sort-Object -Descending {($_ | Where-Object Earning -EQ $null | Measure-Object).Count}, {$(if ($_.Earning -eq $null) {$_.IntervalMultiplier} else {0})}, {$Config.MeasurePowerUsage -and $_.Earning -ne $null -and $_.PowerUsage -eq $null}, {$_.Profit_Bias}, {$_ | Where-Object Earning -NE 0}, {$_.IntervalCount} | Select-Object -First 1)})
+    $BestMiners_Comparison = @($ActiveMiners | Select-Object DeviceName -Unique | ForEach-Object {$Miner_GPU = $_; ($ActiveMiners | Where-Object {(Compare-Object $Miner_GPU.DeviceName $_.DeviceName | Measure-Object).Count -eq 0 -and $_.Earning -ne 0} | Sort-Object -Descending {($_ | Where-Object Earning -EQ $null | Measure-Object).Count}, {$(if ($_.Earning -eq $null) {$_.IntervalMultiplier} else {0})}, {$Config.MeasurePowerUsage -and $_.Earning -ne $null -and $_.PowerUsage -eq $null}, {$_.Profit_Comparison}, {$_ | Where-Object Earning -NE 0}, {$_.IntervalCount} | Select-Object -First 1)})
     $Miners_Device_Combos = @(Get-Combination ($ActiveMiners | Select-Object DeviceName -Unique) | Where-Object {(Compare-Object ($_.Combination | Select-Object -ExpandProperty DeviceName -Unique) ($_.Combination | Select-Object -ExpandProperty DeviceName) | Measure-Object).Count -eq 0})
     $BestMiners_Combos = @(
         $Miners_Device_Combos | ForEach-Object {
@@ -1295,32 +1294,31 @@ while (-not $API.Stop) {
         # Update API information
         if ($API) {Update-APIDeviceStatus $API $Devices}
 
-        if (($RunningMiners | ForEach-Object {@($_.Data | Where-Object Date -GE $PollStart).Count} | Measure-Object -Minimum).Minimum -ge $PollCount) {
-            if (-not ($RunningMiners | Where-Object {$_.DeviceName -like "CPU#*"})) {#Do not preload pool information when CPU mining
-                if ((-not $NewPools_Jobs) -and (Test-Path "Pools" -PathType Container -ErrorAction Ignore) -and ((($StatEnd - (Get-Date).ToUniversalTime()).TotalSeconds) -le $($NewPools_JobsDurations | Measure-Object -Average).Average)) {
-                    Write-Log "Pre-loading pool information"
-                    $NewPools_Jobs = @(
-                        Get-ChildItem "Pools" -File | Where-Object {$Config.Pools.$($_.BaseName) -and $Config.ExcludePoolName -inotcontains $_.BaseName} | Where-Object {$Config.PoolName.Count -eq 0 -or $Config.PoolName -contains $_.BaseName} | ForEach-Object {
-                            $Pool_Name = $_.BaseName
-                            $Pool_Parameters = @{StatSpan = $StatSpan; Config = $Config; JobName = "Pool_$($_.BaseName)"}
-                            $Config.Pools.$Pool_Name | Get-Member -MemberType NoteProperty | ForEach-Object {$Pool_Parameters.($_.Name) = $Config.Pools.$Pool_Name.($_.Name)}
-                            Get-ChildItemContent "Pools\$($_.Name)" -Parameters $Pool_Parameters -Threaded
-                        } | Select-Object
-                    )
-                    if ($API) {$API.NewPools_Jobs = $NewPools_Jobs} #Give API access to pool jobs information
-                    if ((Get-Date).ToUniversalTime() -gt $NextPoll) {Start-Sleep ((Get-Date).ToUniversalTime() - $NextPoll).TotalSeconds}
-                }
-                else {
-                    if ((Get-Date).ToUniversalTime().AddSeconds(- 1) -gt $NextPoll) {Start-Sleep 1}
-                }
-            }
-            else {
+        if (-not ($RunningMiners | Where-Object {$_.DeviceName -like "CPU#*"})) {#Do not preload pool information when CPU mining
+            if ((-not $NewPools_Jobs) -and (Test-Path "Pools" -PathType Container -ErrorAction Ignore) -and ((($StatEnd - (Get-Date).ToUniversalTime()).TotalSeconds) -le $($NewPools_JobsDurations | Measure-Object -Average).Average)) {
+                Write-Log "Pre-loading pool information"
+                $NewPools_Jobs = @(
+                    Get-ChildItem "Pools" -File | Where-Object {$Config.Pools.$($_.BaseName) -and $Config.ExcludePoolName -inotcontains $_.BaseName} | Where-Object {$Config.PoolName.Count -eq 0 -or $Config.PoolName -contains $_.BaseName} | ForEach-Object {
+                        $Pool_Name = $_.BaseName
+                        $Pool_Parameters = @{StatSpan = $StatSpan; Config = $Config; JobName = "Pool_$($_.BaseName)"}
+                        $Config.Pools.$Pool_Name | Get-Member -MemberType NoteProperty | ForEach-Object {$Pool_Parameters.($_.Name) = $Config.Pools.$Pool_Name.($_.Name)}
+                        Get-ChildItemContent "Pools\$($_.Name)" -Parameters $Pool_Parameters -Threaded
+                    } | Select-Object
+                )
+                if ($API) {$API.NewPools_Jobs = $NewPools_Jobs} #Give API access to pool jobs information
                 if ((Get-Date).ToUniversalTime() -gt $NextPoll) {Start-Sleep ((Get-Date).ToUniversalTime() - $NextPoll).TotalSeconds}
             }
+            else {
+                if ((Get-Date).ToUniversalTime().AddSeconds(- 1) -gt $NextPoll) {Start-Sleep 1}
+            }
+        }
+        else {
+            if ((Get-Date).ToUniversalTime() -gt $NextPoll) {Start-Sleep ((Get-Date).ToUniversalTime() - $NextPoll).TotalSeconds}
         }
         if ((Get-Date).ToUniversalTime() -ge $NextPoll) {
             $ThisPoll = $NextPoll
-            $NextPoll = $ThisPoll.AddSeconds(($StatEnd - $ThisPoll).TotalSeconds / ($Config.MinHashRateSamples - $PollCount))
+            if ($PollCount -lt $Config.MinHashRateSamples) {$NextPoll = $ThisPoll.AddSeconds(($StatEnd - $ThisPoll).TotalSeconds / ($Config.MinHashRateSamples - $PollCount))}
+            else {$NextPoll = $StatEnd}
             $PollCount ++
         }
     } Until ($PollCount -gt $Config.MinHashRateSamples) 
