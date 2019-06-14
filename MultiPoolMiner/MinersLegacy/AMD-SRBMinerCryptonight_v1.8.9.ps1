@@ -75,10 +75,9 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
         $Intensity = $_.Intensity
         $MinMemGB = $_.MinMemGB
         $Parameters = $_.Parameters
-        $Threads = $_.Threads
 
         if ($Miner_Device = @($Device | Where-Object {([math]::Round((10 * $_.OpenCL.GlobalMemSize / 1GB), 0) / 10) -ge $MinMemGB})) {
-            $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | Sort-Object Name | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm($(($Miner_Device | Sort-Object Name | Where-Object Model_Norm -eq $Model_Norm).Name -join ';'))"} | Select-Object) -join '_') | Select-Object) -join '-'
+            $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
 
             #Get parameters for active miner devices
             if ($Miner_Config.Parameters.$Algorithm_Norm) {
@@ -99,7 +98,7 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
                     Content  = [PSCustomObject]@{
                         cryptonight_type = $Algorithm
                         double_threads = $DoubleThreads
-                        gpu_conf = @($Miner_Device.Type_PlatformId_Index | Foreach-Object {
+                        gpu_conf = @($Miner_Device.PCIBus_Type_PlatformId_Index | Foreach-Object {
                             [PSCustomObject]@{
                                 "id"        = $_  
                                 "intensity" = $(if ($Intensity | Select-Object -Index $_ -ErrorAction SilentlyContinue) {$Intensity | Select-Object -Index $_} else {0})
