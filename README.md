@@ -5,7 +5,7 @@ https://github.com/MultiPoolMiner/MultiPoolMiner
 
 #### Core Changes
 - API: updated to version 0.94; added '/allminers'
-- Added config item 'DevicePciOrderMapping' for configurations where PCI deviceID order does not match OpenCL DeviceId order (see README)
+- Added config item 'DevicePciOrderMapping' for configurations where PCI deviceID order does not match OpenCL deviceID order (see README)
 - Parameters '-MinerName' and '-ExcludeMinerName' can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed'; MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.1' or MinerName, e.g. 'AMD-TeamRed_v0.5.1-1xEllesmere8GB'
 - Rewrote interval & hashrate collector scheduler (again)
 - Fixed error 'Method invocation failed because [XmRig] does not contain a method named 'op_Addition'.' (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2341#issuecomment-501782784)
@@ -20,8 +20,9 @@ https://github.com/MultiPoolMiner/MultiPoolMiner
 
 ### Breaking changes
 
-**Parameter '-UseDeviceNameForStatsFileNaming' in no longer valid**
-This will trigger all Benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
+**Parameter '-UseDeviceNameForStatsFileNaming' is no longer valid**
+This will trigger all benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
+
 ## Changelog Version 3.4.0 Beta 2
 
 #### Core changes
