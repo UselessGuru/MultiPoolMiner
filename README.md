@@ -21,6 +21,7 @@ https://github.com/MultiPoolMiner/MultiPoolMiner
 ### Breaking changes
 
 **Parameter '-UseDeviceNameForStatsFileNaming' is no longer valid**
+
 This will trigger all benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
 
 ## Changelog Version 3.4.0 Beta 2
