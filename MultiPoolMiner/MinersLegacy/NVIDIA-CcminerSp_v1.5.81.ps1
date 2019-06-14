@@ -24,7 +24,7 @@ else {
     $Commands = [PSCustomObject]@{
         #GPU - profitable 20/04/2018
         "bastion"       = "" #bastion
-        "c11"           = "" #C11
+        #"c11"           = "" #C11/Flax
         "credit"        = "" #Credit
         "deep"          = "" #deep
         "dmd-gr"        = "" #dmd-gr
