@@ -53,6 +53,7 @@ if ($Payout_Currencies) {
         $CoinName       = Get-CoinName $(if ($APIStatusRequest.$_.coins -eq 1) {$APICurrenciesRequest.$($APICurrenciesRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Where-Object {$APICurrenciesRequest.$_.algo -eq $Algorithm}).Name})
         $Algorithm_Norm = Get-AlgorithmFromCoinName $CoinName
         if (-not $Algorithm_Norm) {$Algorithm_Norm = Get-Algorithm $Algorithm}
+        if ($Algorithm_Norm -match "Equihash1445|Equihash1927") {$CoinName = "ManagedByPool"}
         $Workers        = $APIStatusRequest.$_.workers
         $Fee            = $APIStatusRequest.$_.Fees / 100
 
