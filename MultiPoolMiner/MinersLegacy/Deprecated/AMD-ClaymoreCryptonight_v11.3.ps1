@@ -41,13 +41,13 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
 
         #Get parameters for active miner devices
         if ($Miner_Config.Parameters.$Algorithm_Norm) {
-            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters.$Algorithm_Norm $Miner_Device.Type_Vendor_Index
+            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters.$Algorithm_Norm $Miner_Device.PCIBus_Type_Vendor_Index
         }
         elseif ($Miner_Config.Parameters."*") {
-            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters."*" $Miner_Device.Type_Vendor_Index
+            $Parameters = Get-ParameterPerDevice $Miner_Config.Parameters."*" $Miner_Device.PCIBus_Type_Vendor_Index
         }
         else {
-            $Parameters = Get-ParameterPerDevice $Commands.$_  $Miner_Device.Type_Vendor_Index
+            $Parameters = Get-ParameterPerDevice $Commands.$_  $Miner_Device.PCIBus_Type_Vendor_Index
         }
 
         [PSCustomObject]@{
@@ -55,7 +55,7 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
             DeviceName = $Miner_Device.Name
             Path       = $Path
             HashSHA256 = $HashSHA256
-            Arguments  = ("-r -1 -mport -$Miner_Port -xpool $($Pools.$Algorithm_Norm.Protocol)://$($Pools.$Algorithm_Norm.Host):$($Pools.$Algorithm_Norm.Port) -xwal $($Pools.$Algorithm_Norm.User) -xpsw $($Pools.$Algorithm_Norm.Pass)$Parameters$CommonParameters -di $(($Miner_Device | ForEach-Object {'{0:x}' -f $_.Type_Vendor_Index}) -join '')" -replace "\s+", " ").trim()
+            Arguments  = ("-r -1 -mport -$Miner_Port -xpool $($Pools.$Algorithm_Norm.Protocol)://$($Pools.$Algorithm_Norm.Host):$($Pools.$Algorithm_Norm.Port) -xwal $($Pools.$Algorithm_Norm.User) -xpsw $($Pools.$Algorithm_Norm.Pass)$Parameters$CommonParameters -di $(($Miner_Device | ForEach-Object {'{0:x}' -f $_.PCIBus_Type_Vendor_Index}) -join '')" -replace "\s+", " ").trim()
             HashRates  = [PSCustomObject]@{$Algorithm_Norm = $Stats."$($Miner_Name)_$($Algorithm_Norm)_HashRate".Week}
             API        = "Claymore"
             Port       = $Miner_Port
