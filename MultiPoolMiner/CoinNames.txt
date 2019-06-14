@@ -47,7 +47,7 @@
     "Iq":  "IqCash",
     "Joule":  "JouleCoin",
     "Lbry.Io":  "LbryCredits",
-    "LiteCoinZ":  "LiteCoinZ"
+    "LiteCoinZ":  "LiteCoinZ",
     "Lucky":  "Luckybit",
     "Lux":  "LuxCoin",
     "Machine":  "MachineCoin",

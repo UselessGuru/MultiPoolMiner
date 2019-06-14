@@ -9,9 +9,9 @@ param(
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
 $Path = ".\Bin\$($Name)\wildrig.exe"
-$HashSHA256 = ""
-$Uri = "https://github.com/andru-kun/wildrig-multi/releases/download/0.17.3/wildrig-multi-windows-0.17.3-beta.7z"
-$ManualUri = "D90986A16C4CC6E815FDAD75B5E46660D7AAEDF432C3E4B26C7BEE6EEEA1A548"
+$HashSHA256 = "1BEB7005D14E8AB6214A281191462783FD22BE07E2E6B77F303242EA7CE76F56"
+$Uri = "https://github.com/andru-kun/wildrig-multi/releases/download/0.17.5/wildrig-multi-windows-0.17.5-beta.7z"
+$ManualUri = "https://bitcointalk.org/index.php?topic=5023676.0"
 
 $Miner_Version = Get-MinerVersion $Name
 $Miner_BaseName = Get-MinerBaseName $Name
@@ -24,8 +24,9 @@ else {
     $Commands = [PSCustomObject]@{
         "aergo"          = " --opencl-threads auto --opencl-launch auto"
         "bcd"            = " --opencl-threads auto --opencl-launch auto"
-        # "bitcore"        = " --opencl-threads auto --opencl-launch auto"; Same as Timetravel10
-        "blake2b"        = " --opencl-threads auto --opencl-launch auto"
+        # "bitcore"      = " --opencl-threads auto --opencl-launch auto"; Same as Timetravel10
+        "blake2b-btcc"   = " --opencl-threads auto --opencl-launch auto" # new in 0.17.5 preview 8
+        "blake2b-glt"    = " --opencl-threads auto --opencl-launch auto" # new in 0.17.5 preview 8
         "bmw512"         = " --opencl-threads auto --opencl-launch auto" # new in 0.15.4 preview 8
         "c11"            = " --opencl-threads auto --opencl-launch auto"
         "dedal"          = " --opencl-threads auto --opencl-launch auto"
@@ -100,7 +101,7 @@ $Devices | Select-Object Model -Unique | ForEach-Object {
             DeviceName         = $Miner_Device.Name
             Path               = $Path
             HashSHA256         = $HashSHA256
-            Arguments          = ("--algo=$_ --api-port=$Miner_Port --url=$($Pools.$Algorithm_Norm.Protocol)://$($Pools.$Algorithm_Norm.Host):$($Pools.$Algorithm_Norm.Port) --user=$($Pools.$Algorithm_Norm.User) --pass=$($Pools.$Algorithm_Norm.Pass)$(if($Config.CreateMinerInstancePerDeviceModel -and @($Devices | Select-Object Model_Norm -Unique).count -gt 1){" --multiple-instance"})$Parameters$CommonParameters --opencl-platform=$($Miner_Device.PlatformId | Sort-Object -Unique) --opencl-devices=$(($Miner_Device | ForEach-Object {'{0:x}' -f $_.Type_Vendor_Index}) -join ',')" -replace "\s+", " ").trim()
+            Arguments          = ("--algo=$_ --api-port=$Miner_Port --url=$($Pools.$Algorithm_Norm.Protocol)://$($Pools.$Algorithm_Norm.Host):$($Pools.$Algorithm_Norm.Port) --user=$($Pools.$Algorithm_Norm.User) --pass=$($Pools.$Algorithm_Norm.Pass)$(if($Config.CreateMinerInstancePerDeviceModel -and @($Devices | Select-Object Model_Norm -Unique).count -gt 1){" --multiple-instance"})$Parameters$CommonParameters --opencl-platform=$($Miner_Device.PlatformId | Sort-Object -Unique) --opencl-devices=$(($Miner_Device | ForEach-Object {'{0:x}' -f $_.PCIBus_Type_Vendor_Index}) -join ',')" -replace "\s+", " ").trim()
             HashRates          = [PSCustomObject]@{$Algorithm_Norm = $Stats."$($Miner_Name)_$($Algorithm_Norm)_HashRate".Week}
             API                = "XmRig"
             Port               = $Miner_Port

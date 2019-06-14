@@ -9,8 +9,8 @@ param(
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
 $Path = ".\Bin\$($Name)\teamredminer.exe"
-$HashSHA256 = "6FCFA5A4AA66A416F45C1754F2EF8828DDF437E694F5BABAEAC0A2096871F624"
-$Uri = "https://github.com/todxx/teamredminer/releases/download/v0.4.5/teamredminer-v0.4.5-win.zip"
+$HashSHA256 = "123F64692CDC21F142D1F7EC51B3EA81878C533A810EF625BB7A0EA5B3FD27B0"
+$Uri = "https://github.com/todxx/teamredminer/releases/download/0.5.1/teamredminer-v0.5.1-win.zip"
 $ManualUri = "https://github.com/todxx/teamredminer"
 
 $Miner_Version = Get-MinerVersion $Name
@@ -22,16 +22,19 @@ if (-not $Miner_Config) {$Miner_Config = $Config.MinersLegacy.$Miner_BaseName."*
 if ($Miner_Config.Commands) {$Commands = $Miner_Config.Commands}
 else {
     $Commands = [PSCustomObject[]]@(
-        [PSCustomObject]@{Algorithm = "cnr";       Fee = 2.5; Params = ""} #CryptonightR, new in 0.4.1
-        [PSCustomObject]@{Algorithm = "cnv8";      Fee = 2.5; Params = ""} #CryptonightV8, new in 0.3.5
-        [PSCustomObject]@{Algorithm = "cnv8_dbl";  Fee = 2.5; Params = ""} #CryptonightDoubleV8, new in 0.4.2
-        [PSCustomObject]@{Algorithm = "cnv8_half"; Fee = 2.5; Params = ""} #CryptonightHalfV8, new in 0.4.2
-        [PSCustomObject]@{Algorithm = "cnv8_trtl"; Fee = 2.5; Params = ""} #CryptonightTurtle, new in 0.4.3
-        [PSCustomObject]@{Algorithm = "cnv8_rwz";  Fee = 2.5; Params = ""} #CryptonightRwzV8, new in 0.4.2
-        [PSCustomObject]@{Algorithm = "cnv8_upx2"; Fee = 2.5; Params = ""} #CryptonightUpx2V8, new in 0.4.2
+        [PSCustomObject]@{Algorithm = "cnr";       Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightR, new in 0.4.1
+        [PSCustomObject]@{Algorithm = "cnv8";      Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightV8, new in 0.3.5
+        [PSCustomObject]@{Algorithm = "cnv8_dbl";  Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightDoubleV8, new in 0.4.2
+        [PSCustomObject]@{Algorithm = "cnv8_half"; Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightHalfV8, new in 0.4.2
+        [PSCustomObject]@{Algorithm = "cnv8_trtl"; Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightTurtle, new in 0.4.3
+        [PSCustomObject]@{Algorithm = "cnv8_rwz";  Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightRwzV8, new in 0.4.2
+        [PSCustomObject]@{Algorithm = "cnv8_upx2"; Fee = 2.5; Params = " --auto_tune=NONE"} #CryptonightUpx2V8, new in 0.4.2
         [PSCustomObject]@{Algorithm = "lyra2rev3"; Fee = 2.5; Params = ""} #Lyra2rev3, new in 0.3.9
         [PSCustomObject]@{Algorithm = "lyra2z";    Fee = 3;   Params = ""} #Lyra2Z, new in 0.3.5
         [PSCustomObject]@{Algorithm = "phi2";      Fee = 3;   Params = ""} #Phi2, new in 0.3.5
+        [PSCustomObject]@{Algorithm = "x16r";      Fee = 2.5; Params = ""} #X16r, new in 0.5.0
+        [PSCustomObject]@{Algorithm = "x16s";      Fee = 2.5; Params = ""} #X16r, new in 0.5.0
+        [PSCustomObject]@{Algorithm = "x16rt";     Fee = 2.5; Params = ""} #X16rt, new in 0.5.0
     )
 }
 

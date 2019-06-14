@@ -7,7 +7,7 @@
 
 ###### Licensed under the GNU General Public License v3.0 - Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/LICENSE
 
-README.md is based on README.txt - updated on 01/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
+README.md is based on README.txt - updated on 14/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
 
 
 
@@ -98,7 +98,7 @@ By default MPM will use the values from the command line. If you hardcode config
 
 **-Currency [BTC, USD, EUR, GBP, ETH ...]**
 Choose the default currency or currencies your profit stats will be shown in.
-Important: MultiPoolMiner will use the first currency in the list as main currency. All profit / earning numbers will be displayed in the main currency.
+Important: MultiPoolMiner will use the first currency in the list as main currency. All profit / earning numbers will be displayed in the main currency. Use commas to separate multiple values.
 Note: Instead af BTC you can also use mBTC (= BTC / 1000).
 
 **-Dashboard**
@@ -108,7 +108,7 @@ Launch web dashboard after MPM start.
 Specify the number of seconds required to pass before opening each miner. It is useful when cards are more sensitive to switching and need some extra time to recover (eg. clear DAG files from memory)
 
 **-DeviceName**
-Choose the relevant GPU(s) and/or CPU mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]
+Choose the relevant GPU(s) and/or CPU mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]. Use commas to separate multiple values.
 
 **-DisableMinersWithDevFee**
 Use only miners that do not have a dev fee built in
@@ -120,21 +120,22 @@ Disable miner developer fees (Note: not all miners support turning off their bui
 Donation of mining time in minutes per day to aaronsace. Default is 24, minimum is 10 minutes per day (less than 0.7% fee). The downloaded miner software can have their own donation system built in. Check the readme file of the respective miner used for more details.
 
 **-ExcludeAlgorithm**
-Similar to the *-Algorithm* command but it is used to *exclude* unwanted algorithms. Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms; this is also a per-pool setting (see Advanced Configuration)
+Similar to the *-Algorithm* command but it is used to *exclude* unwanted algorithms. Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms; this is also a per-pool setting (see Advanced Configuration). Use commas to separate multiple values.
 
 **-ExcludeCoinName [Zcash, ZeroCoin etc.]**
-Similar to the *-CoinName* command but it is used to exclude selected coins from being mined; this is also a per-pool setting (see Advanced Configuration)	
+Similar to the *-CoinName* command but it is used to exclude selected coins from being mined; this is also a per-pool setting (see Advanced Configuration). Use commas to separate multiple values.
 Note: Only the pools ending in ...Coins expose the coin name in their API.
 
 **-ExcludeDeviceName**
-Similar to the *-DeviceName* command but it is used to *exclude* unwanted devices for mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]
+Similar to the *-DeviceName* command but it is used to *exclude* unwanted devices for mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]. Use commas to separate multiple values.
 
 **-ExcludeMinerName**
-Similar to the *-MinerName* command but it is used to *exclude* certain miners you don't want to use. This is useful if a miner is causing issues with your machine. A full list of available miners and parameters used can be found here: https://multipoolminer.io/miners
+Similar to the *-MinerName* command but it is used to *exclude* certain miners you don't want to use. This is useful if a miner is causing issues with your machine. Use commas to separate multiple values.
 Important: Newer miners, e.g. ClaymoreEthash create several child-miner names, e.g. ClaymoreEthash-GPU#01-Pascal-40. These can also be used with *-ExcludeMinerName*.
-	
+The parameter value(s) can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed', MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.1' or MinerName, e.g. 'AMD-TeamRed_v0.5.1-1xEllesmere8GB'. Use commas to separate multiple values.
+
 **-ExcludePoolName**
-Similar to the *-PoolName* command but it is used to exclude unwanted mining pools.
+Similar to the *-PoolName* command but it is used to exclude unwanted mining pools. Use commas to separate multiple values.
 
 **-MinHashRateSamples**
 Minimum number of hashrate samples MPM will collect during benchmark per interval (higher numbers produce more exact numbers, but might prolong benchmaking). Allowed values: 10 - 99 (default is 10)
@@ -162,6 +163,8 @@ Note: This requires advanced configuration steps (see ConfigHWinfo64.pdf)
 
 **-MinerName**
 Specify to only include (restrict to) certain miner applications.
+The parameter value(s) can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed', MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.1' or MinerName, e.g. 'AMD-TeamRed_v0.5.1-1xEllesmere8GB'. Use commas to separate multiple values.
+
 
 **-MinerstatusKey**
 By default the MPM monitor uses the BTC address ('-Wallet') to identify your mining machine (rig). Use -MinerstatusKey [your-miner-status-key] to anonymize your rig. To get your minerstatuskey goto to https://multipoolminer.io/monitor
@@ -178,7 +181,7 @@ MPM queries the pool balances every n minutes. Default is 15, minimum is 0 (=on 
 Note: The balance overview is still shown on each loop.
     
 **-PoolName [ahashpool(coins), blazepool(coins), blockmasters(coins), hashrefinery(coins), miningpoolhub(coins), nicehash, nlpool(coins), phiphipool(coins), ravenminer, ravenminereu, yiimp, zpool(coins)]**
-The following pools are currently supported (in alphabetical order):
+The following pools are currently supported (in alphabetical order); use commas to separate multiple values:
 
 	- AHashPool / AHashPoolCoins https://www.ahashpool.com/
 
@@ -393,6 +396,7 @@ Warning: The JSON file structure is very fragile - every comma counts, so be car
   "Debug": "$Debug",
   "Delay": "$Delay",
   "DeviceName": "$DeviceName",
+  "DevicePciOrderMapping": "$DevicePciOrderMapping",
   "DisableDevFeeMining": "$DisableDevFeeMining",
   "DisableMinersWithDevFee": "$DisableMinersWithDevFee",
   "Donate": "$Donate",
@@ -681,7 +685,7 @@ Storing the miner configuration in the config file allows for easier version / m
       }
     }
 
-The miner name must be entered without the ending version number (e.g. for AMD_NVIDIA-ClaymoreEthash_v0.14.6 remove _v0.14.6)
+The miner name must be entered without the ending version number (e.g. for AMD_NVIDIA-ClaymoreEthash_v14.6 remove _v14.6)
 The algorithm name must be entered in the normalized form as returned by Get-Algorithm.
 Note: All parameter values must be entered with a leading space (' ') character!
 
@@ -800,6 +804,29 @@ You can also use any MPM internal variables or simple powershell code like this:
 
 Settings in this section affect the overall behaviour of MPM and will take precedence over command line parameters.
 
+#### DevicePciOrderMapping
+
+Some miners (currently Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig) enumerate the GPU devices based on the PCI deviceID.
+All other miners use the device order as returned by the OpenCL API.
+The result of the two ordering methods can be differnt and will lead to invalid device selectons where two miners, e.g. Gminer and ClaymoreDual, are selecting different device IDs, but as a consequence will finally end up running on the same GPU causing errors.
+
+To manually override the PCI deviceID mapping create a section in the config file similar to this:
+
+    {
+      ...
+      "DevicePciOrderMapping": {
+        "GPU#00": "0",
+        "GPU#01": "1",
+        "GPU#02": "3",
+        "GPU#03": "2"
+      },
+    ...
+    }
+Note: In most cases there is no need for this extra mapping and all miners will operate just fine. This mapping only applies to miners using the PCI deviceID for the device enumeration. 
+More info can be found here:
+https://github.com/nanopool/nanominer/issues/30
+https://github.com/develsoftware/GMinerRelease/issues/18
+    
 #### Ignore pool and miner fees
 
 Beginning with version 3.1.0 MPM makes miner and pool fees part of the profitability calculation. This will lead to somewhat lower, but more accurate profit estimates.

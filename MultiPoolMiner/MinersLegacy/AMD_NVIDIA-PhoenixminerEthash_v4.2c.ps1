@@ -20,10 +20,10 @@ if (-not $Miner_Config) {$Miner_Config = $Config.MinersLegacy.$Miner_BaseName."*
 
 $UnsupportedDriverVersions = @("2841.5")
 $CUDAVersion = ($Devices | Where-Object Type -EQ "GPU" | Where-Object Vendor -EQ "NVIDIA Corporation" | Select-Object -Unique).OpenCL.Platform.Version -replace ".*CUDA "
-$AMDVersion  = ($Devices | Where-Object Type -EQ "GPU" | Where-Object Vendor -EQ "Advanced Micro Devices, Inc." | Select-Object -Unique).OpenCL.Platform.Version -replace ".*\(" -replace "\)"
+$AMDVersion  = ($Devices | Where-Object Type -EQ "GPU" | Where-Object Vendor -EQ "Advanced Micro Devices, Inc." | Select-Object -Unique).OpenCL.DriverVersion
 
 if ($UnsupportedDriverVersions -contains $AMDVersion) {
-    Write-Log -Level Warn "Miner ($($Name)) does not support AMD driver version $($AMDVersion). Please update your AMD drivers. "
+    Write-Log -Level Warn "Miner ($($Name)) does not support the installed AMD driver version $($AMDVersion). Please update your AMD drivers. "
 }
 
 #Commands from config file take precedence
@@ -165,7 +165,7 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
                 DeviceName         = $Miner_Device.Name
                 Path               = $Path
                 HashSHA256         = $HashSHA256
-                Arguments          = ("-mport -$Miner_Port$(if($Pools.$Main_Algorithm_Norm.Name -eq "NiceHash") {" -proto 4"} else {" -proto 1"}) -pool $(if ($Pools.$Main_Algorithm_Norm.SSL) {"ssl://"})$($Pools.$Main_Algorithm_Norm.Host):$($Pools.$Main_Algorithm_Norm.Port) -wal $($Pools.$Main_Algorithm_Norm.User) -pass $($Pools.$Main_Algorithm_Norm.Pass)$Arguments_Primary$Arguments_Secondary$Coin$Parameters$CommonParameters$TurboKernel -gpus $(($Miner_Device | ForEach-Object {'{0:x}' -f ($_.Type_Index + 1)}) -join ',')" -replace "\s+", " ").trim()
+                Arguments          = ("-mport -$Miner_Port$(if($Pools.$Main_Algorithm_Norm.Name -eq "NiceHash") {" -proto 4"} else {" -proto 1"}) -pool $(if ($Pools.$Main_Algorithm_Norm.SSL) {"ssl://"})$($Pools.$Main_Algorithm_Norm.Host):$($Pools.$Main_Algorithm_Norm.Port) -wal $($Pools.$Main_Algorithm_Norm.User) -pass $($Pools.$Main_Algorithm_Norm.Pass)$Arguments_Primary$Arguments_Secondary$Coin$Parameters$CommonParameters$TurboKernel -gpus $(($Miner_Device | ForEach-Object {'{0:x}' -f ($_.Type_PlatformId_Index + 1)}) -join ',')" -replace "\s+", " ").trim()
                 HashRates          = $Miner_HashRates
                 API                = "Claymore"
                 Port               = $Miner_Port

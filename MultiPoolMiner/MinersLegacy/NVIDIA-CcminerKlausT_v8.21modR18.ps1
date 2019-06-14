@@ -33,7 +33,7 @@ if ($Miner_Config.Commands) {$Commands = $Miner_Config.Commands}
 else {
     $Commands = [PSCustomObject]@{
         #GPU - profitable 25/11/2018
-        "c11"           = "" #C11
+        #"c11"           = "" #C11/Flax
         "deep"          = "" #deep
         "dmd-gr"        = "" #dmd-gr
         "fresh"         = "" #fresh

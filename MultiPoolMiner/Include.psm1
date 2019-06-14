@@ -41,7 +41,7 @@ function Update-APIDeviceStatus {
     param(
         [Parameter(Mandatory = $true)]
         [HashTable]$Api,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [Array]$Devices 
     )
 
@@ -965,6 +965,8 @@ function Get-Device {
         [Parameter(Mandatory = $false)]
         [String[]]$ExcludeName = @(),
         [Parameter(Mandatory = $false)]
+        [PSCustomObject]$Config = [PSCustomObject]@{},
+        [Parameter(Mandatory = $false)]
         [Switch]$Refresh = $false
     )
 
@@ -1045,6 +1047,19 @@ function Get-Device {
                     Model = "$($Device_OpenCL.Name)$(if ($Device_OpenCL.Vendor -eq "Advanced Micro Devices, Inc.") {"$([math]::Round((4 * $Device_OpenCL.GlobalMemSize / 1GB), 0) / 4)GB"})"
                     Model_Norm = "$($Device_OpenCL.Name -replace '[^A-Z0-9]' -replace 'GeForce')$(if ($Device_OpenCL.Vendor -eq "Advanced Micro Devices, Inc.") {"$([math]::Round((4 * $Device_OpenCL.GlobalMemSize / 1GB), 0) / 4)GB"})"
                 }
+
+                #Optional custom device mapping where PciDeviceID order does not match OpenCL DeviceId order
+                if ($Config.DevicePciOrderMapping.(("{0}#{1:d2}" -f $_.Type, $Device.Type_Index).ToUpper())) {
+                    $Index_Difference = $Config.DevicePciOrderMapping.(("{0}#{1:d2}" -f $_.Type, $Device.Type_Index).ToUpper()) - $Device.Type_Index
+                }
+                else {
+                    $Index_Difference = 0
+                }
+                $Device | Add-Member PCIBus_Index ([Int]($Device.Index + $Index_Difference))
+                $Device | Add-Member PCIBus_Type_Index ([Int]($Device.Type_Index + $Index_Difference))
+                $Device | Add-Member PCIBus_Type_PlatformId_Index ([Int]($Device.Type_PlatformId_Index + $Index_Difference))
+                $Device | Add-Member PCIBus_Type_Vendor_Index ([Int]($Device.Type_Vendor_Index + $Index_Difference))
+                $Device | Add-Member PCIBus_Vendor_Index  ([Int]($Device.Vendor_Index + $Index_Difference))
 
                 if ((-not $Name) -or ($Name_Devices | Where-Object {($Device | Select-Object ($_ | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name)) -like ($_ | Select-Object ($_ | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name))})) {
                     if ((-not $ExcludeName) -or (-not ($ExcludeName_Devices | Where-Object {($Device | Select-Object ($_ | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name)) -like ($_ | Select-Object ($_ | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name))}))) {

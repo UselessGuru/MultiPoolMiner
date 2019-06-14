@@ -123,11 +123,6 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
         $CommonParameters = $CommonParameters -replace " -strap [\d,]{1,}"
     }
     
-    #Remove -strap parameter for Nvidia cards, OhGoAnETHlargementPill is not compatible
-    if ($Device.Vendor -eq "NVIDIA Corporation" -and (Get-CIMInstance CIM_Process | Where-Object Processname -like "OhGodAnETHlargementPill*")) {
-        $CommonParameters = $CommonParameters -replace " -strap [\d,]{1,}"
-    }
-
     $Commands | ForEach-Object {$Main_Algorithm_Norm = Get-Algorithm $_.MainAlgorithm; $_} | Where-Object {$Pools.$Main_Algorithm_Norm.Host} | ForEach-Object {
         $Main_Algorithm = $_.MainAlgorithm
         $MinMemGB = $_.MinMemGB
@@ -152,11 +147,11 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
             }
 
             if ($Secondary_Algorithm_Norm) {
-                switch ($_.SecondaryAlgorithm) {
-                    "decred" {$Secondary_Algorithm = "dcr"}
-                    "lbry"   {$Secondary_Algorithm = "lbc"}
-                    "pascal" {$Secondary_Algorithm = "pasc"}
-                    "sia"    {$Secondary_Algorithm = "sc"}
+                switch ($_.$Secondary_Algorithm_Norm) {
+                    "Decred"      {$Secondary_Algorithm = "dcr"}
+                    "Lbry"        {$Secondary_Algorithm = "lbc"}
+                    "Pascal"      {$Secondary_Algorithm = "pasc"}
+                    "SiaClaymore" {$Secondary_Algorithm = "sc"}
                 }
                 $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') + @("$Main_Algorithm_Norm$($Secondary_Algorithm_Norm -replace 'Nicehash'<#temp fix#>)") + @("$(if ($_.SecondaryIntensity -ge 0) {$_.SecondaryIntensity})") | Select-Object) -join '-'
                 $Miner_HashRates = [PSCustomObject]@{"$Main_Algorithm_Norm" = $Stats."$($Miner_Name)_$($Main_Algorithm_Norm)_HashRate".Week; "$Secondary_Algorithm_Norm" = $Stats."$($Miner_Name)_$($Secondary_Algorithm_Norm)_HashRate".Week}
@@ -195,6 +190,11 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
             }
             else {$NoFee = ""}
 
+            #Remove -strap parameter for Nvidia 1080(Ti) and Titan cards, OhGoAnETHlargementPill is not compatible
+            if ($Device.Model -match "GeForce GTX 1080|GeForce GTX 1080 Ti|Nvidia TITAN.*" -and (Get-CIMInstance CIM_Process | Where-Object Processname -like "OhGodAnETHlargementPill*")) {
+                $CommonParameters = $CommonParameters -replace " -strap [\d,]{1,}"
+            }
+
             [PSCustomObject]@{
                 Name               = $Miner_Name
                 BaseName           = $Miner_BaseName
@@ -202,7 +202,7 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
                 DeviceName         = $Miner_Device.Name
                 Path               = $Path
                 HashSHA256         = $HashSHA256
-                Arguments          = ("-mport -$Miner_Port -epool $($Pools.$Main_Algorithm_Norm.Host):$($Pools.$Main_Algorithm_Norm.Port) -ewal $($Pools.$Main_Algorithm_Norm.User) -epsw $($Pools.$Main_Algorithm_Norm.Pass) -allpools 1$Allcoins -esm 3$Arguments_Secondary$Parameters$CommonParameters$NoFee -di $(($Miner_Device | ForEach-Object {'{0:x}' -f $_.Type_Vendor_Index}) -join '')" -replace "\s+", " ").trim()
+                Arguments          = ("-mport -$Miner_Port -epool $($Pools.$Main_Algorithm_Norm.Host):$($Pools.$Main_Algorithm_Norm.Port) -ewal $($Pools.$Main_Algorithm_Norm.User) -epsw $($Pools.$Main_Algorithm_Norm.Pass) -allpools 1$Allcoins -esm 3$Arguments_Secondary$Parameters$CommonParameters$NoFee -di $(($Miner_Device | ForEach-Object {'{0:x}' -f $_.PCIBus_Type_Vendor_Index}) -join '')" -replace "\s+", " ").trim()
                 HashRates          = $Miner_HashRates
                 API                = "Claymore"
                 Port               = $Miner_Port

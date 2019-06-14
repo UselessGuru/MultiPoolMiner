@@ -33,7 +33,7 @@ else {
 
 #CommonCommands from config file take precedence
 if ($Miner_Config.CommonParameters) {$CommonParameters = $Miner_Config.CommonParameters}
-else {$CommonParameters = " --workbatch HIGH --shortstats 10 --digits 2"}
+else {$CommonParameters = " --workbatch HIGH --shortstats 5 --digits 3"}
 
 $Coins = [PSCustomObject]@{
     "ManagedByPool" = "AUTO" #pers auto switching; https://bitcointalk.org/index.php?topic=2759935.msg43324268#msg43324268
@@ -114,7 +114,7 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
                     DeviceName       = $Miner_Device.Name
                     Path             = $Path
                     HashSHA256       = $HashSHA256
-                    Arguments        = ("--coin $coin --pool $($Pools.$Algorithm_Norm.Host) --port $($Pools.$Algorithm_Norm.port) --user $($Pools.$Algorithm_Norm.User) --pass $($Pools.$Algorithm_Norm.pass) --apiport $Miner_Port$Parameters$CommonParameters $(if ($Pools.$Algorithm_Norm.SSL) {"--tls 1 "} else {"--tls 0 "})--devices $(($Miner_Device | ForEach-Object {'{0:x}' -f $_.Type_Index}) -join ',')").trim()
+                    Arguments        = ("--coin $coin --pool $($Pools.$Algorithm_Norm.Host) --port $($Pools.$Algorithm_Norm.port) --user $($Pools.$Algorithm_Norm.User) --pass $($Pools.$Algorithm_Norm.pass) --apiport $Miner_Port$Parameters$CommonParameters $(if ($Pools.$Algorithm_Norm.SSL) {"--tls 1 "} else {"--tls 0 "})--devices $(($Miner_Device | ForEach-Object {'{0:x}' -f $_.PCIBus_Type_Index}) -join ',')").trim()
                     HashRates        = [PSCustomObject]@{$Algorithm_Norm = $Stats."$($Miner_Name)_$($Algorithm_Norm)_HashRate".Week}
                     API              = "lolMinerApi"
                     Port             = $Miner_Port

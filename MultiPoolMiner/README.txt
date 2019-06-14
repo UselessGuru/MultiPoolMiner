@@ -17,7 +17,7 @@ TWITTER: @multipoolminer
 Licensed under the GNU General Public License v3.0
 Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/LICENSE
 
-README.txt - updated on 01/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
+README.txt - updated on 14/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
 
 ====================================================================
 
@@ -149,7 +149,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	Important: Newer miners, e.g. ClaymoreEthash create several child-miner names, e.g. ClaymoreEthash-GPU#01-Pascal-40. These can also be used with '-ExcludeMinerName'.
 	
 -ExcludePoolName
-	Similar to the '-PoolName' command but it is used to exclude unwanted mining pools.
+	Similar to the '-PoolName' command but it is used to exclude unwanted mining pools. Use commas to separate multiple values.
 
 -MinHashRateSamples
 	Minimum number of hashrate samples MPM will collect during benchmark per interval (higher numbers produce more exact numbers, but might prolong benchmaking). Allowed values: 10 - 99 (default is 10)
@@ -177,6 +177,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 
 -MinerName
 	Specify to only include (restrict to) certain miner applications.
+	The parameter value(s) can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed', MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.1' or MinerName, e.g. 'AMD-TeamRed_v0.5.1-1xEllesmere8GB'. Use commas to separate multiple values.
 
 -MinerstatusKey
 	By default the MPM monitor uses the BTC address ('-Wallet') to identify your mining machine (rig). Use -MinerstatusKey [your-miner-status-key] to anonymize your rig. To get your minerstatuskey goto to https://multipoolminer.io/monitor
@@ -193,7 +194,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	Note: The balance overview is still shown on each loop.
     
 -Poolname [ahashpool(coins), blazepool(coins), blockmasters(coins), hashrefinery(coins), miningpoolhub(coins), nicehash, nlpool(coins), phiphipool(coins), ravenminer, ravenminereu, yiimp, zpool(coins)]
-	The following pools are currently supported (in alphabetical order): 
+	The following pools are currently supported (in alphabetical order); use commas to separate multiple values:
 
     ## AHashPool / AHashPoolCoins
       WebSite: https://www.ahashpool.com/ 
@@ -398,6 +399,7 @@ Sample content of 'Config.txt'
   "Debug": "$Debug",
   "Delay": "$Delay",
   "DeviceName": "$DeviceName",
+  "DevicePciOrderMapping": "$DevicePciOrderMapping",
   "DisableDevFeeMining": "$DisableDevFeeMining",
   "DisableMinersWithDevFee": "$DisableMinersWithDevFee",
   "Donate": "$Donate",
@@ -802,6 +804,29 @@ You can also use any MPM internal variables or simple powershell code like this:
 Advanced general configuration
 
 Settings in this section affect the overall behaviour of MPM and will take precedence over command line parameters.
+
+DevicePciOrderMapping
+
+Some miners (Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig) enumerate the GPU devices based on the PCI deviceID.
+All other miners use the device order as returned by the OpenCL API.
+The result of the two ordering methods can be differnt and will lead to invalid device selectons where two miners, e.g. Gminer and ClaymoreDual, are selecting different device IDs, but as a consequence will finally end up running on the same GPU causing errors.
+
+To manually override the PCI deviceID mapping create a section in the config file similar to this:
+
+    {
+      ...
+      "DevicePciOrderMapping": {
+        "GPU#00": "0",
+        "GPU#01": "1",
+        "GPU#02": "3",
+        "GPU#03": "2"
+      },
+    ...
+    }
+Note: In most cases there is no need for this extra mapping and all miners will operate just fine. This mapping only applies to miners using the PCI deviceID for the device enumeration. 
+More info can be found here:
+https://github.com/nanopool/nanominer/issues/30
+https://github.com/develsoftware/GMinerRelease/issues/18
 
 Ignore pool and miner fees
 

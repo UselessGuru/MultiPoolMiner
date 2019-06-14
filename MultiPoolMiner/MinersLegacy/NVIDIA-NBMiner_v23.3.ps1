@@ -9,8 +9,8 @@ param(
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
 $Path = ".\Bin\$($Name)\nbminer.exe"
-$HashSHA256 = "E86DEA758FD49559E25CB59F6BA48F771639C126AED5689A470FF9A77FA949DA"
-$Uri = "https://github.com/NebuTech/NBMiner/releases/download/v23.2.1/NBMiner_23.2_hotfix_Win.zip"
+$HashSHA256 = "BEF420099C0F7161A25EFD2F1C1E19F43D8CEC5ED8A4AA7988CBA3AD806FBBDE"
+$Uri = "https://github.com/NebuTech/NBMiner/releases/download/v23.3/NBMiner_23.3_Win.zip"
 $ManualUri = "https://github.com/gangnamtestnet/progminer/releases"
 
 $Miner_Version = Get-MinerVersion $Name

@@ -39,7 +39,7 @@ else {
         "blake2b"       = "" # new with 2.3.1
         "bmw"           = "" #BMW
         "cryptolight"   = "" #CryptonightLite
-        #"c11/flax"     = "" #C11
+        "c11/flax"      = "" #C11
         "deep"          = "" #Deep
         "dmd-gr"        = "" #DMDGR
         #"equihash"     = "" #Equihash - Beaten by Bminer by 30%
@@ -79,7 +79,7 @@ else {
         #"whirlpoolx"    = "" #whirlpoolx
         "x11evo"        = "" #X11evo
         "x12"           = "" #X12
-# Other free miners are faster        "x16r"          = "" #X16R
+      # "x16r"          = "" #X16R; Other free miners are faster
         #"X16s"         = "" #X16S
         #"x17"          = "" #x17
         "zr5"           = "" #zr5

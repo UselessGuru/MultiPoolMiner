@@ -27,12 +27,12 @@ if ($CUDAVersion -and [System.Version]$CUDAVersion -lt [System.Version]$Required
 }
 
 if ($CUDAVersion -lt [System.Version]("10.0.0")) {
-    $HashSHA256 = "207F0A1AABA5B053085017CDFB25277B003D6F7A9C9B562D3C9E073C78B6E1E8"
-    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.11.0/t-rex-0.11.0-win-cuda9.2.zip"
+    $HashSHA256 = "628FD49E290BB8243BCBE3EF7AAA4ACC45ED311C2A6A7E0ACA9DB7B77566F9A2"
+    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.11.1/t-rex-0.11.1-win-cuda9.2.zipp"
 }
 else {
-    $HashSHA256 = "57318486B48D2D5DC64D41F3AC097A32D95D31856913F9438F0D4104DD8B1F43"
-    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.11.0/t-rex-0.11.0-win-cuda10.0.zip"
+    $HashSHA256 = "0ABC6E18EF038FC4551AFD738D53BBCE51F021CF046183F04E6C42CB32D525B4"
+    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.11.1/t-rex-0.11.1-win-cuda10.0.zip"
 }
 
 #Commands from config file take precedence
