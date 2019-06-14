@@ -12,7 +12,7 @@ https://github.com/MultiPoolMiner/MultiPoolMiner
 
 #### Miner changes
 - Fixed AMD_NVIDIA-BMiner_v15.5.3; device enumeration was broken in mixed rigs (AMD &NVIDIA in the same computer)
-- Fixed miners Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig device enumeration, can now use mapping as configured by 'DevicePciOrderMapping' 
+- Fixed miners Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig; device enumeration can now use mapping as configured by 'DevicePciOrderMapping' 
 - Updated AMD-TeamRed_v0.5.1; support for X16r, X16s & X16rt
 - Updated AMD-WildRig_v0.17.5; support for Blake2b-BTCC & Blake2b-Glt
 - Updated NVIDIA-CcminerTrex_v0.11.1
