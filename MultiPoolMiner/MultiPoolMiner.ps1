@@ -430,7 +430,7 @@ while (-not $API.Stop) {
 
     #Power cost preparations
     $PowerPrice = [Double]0
-    $PowerPriceDigits = 0
+    $PowerPriceDigits = (Get-Culture).NumberFormat.CurrencyDecimalDigits
     $PowerCostBTCperW = [Double]0
     $BasePowerCost = [Double]0
     if ($Config.MeasurePowerUsage) {
@@ -640,7 +640,6 @@ while (-not $API.Stop) {
             $Config.PowerPrices | Add-Member "00:00" ($Config.PowerPrices.($Config.PowerPrices | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Sort-Object | Select-Object -Last 1))
         }
         $PowerPrice = [Double]($Config.PowerPrices.($Config.PowerPrices | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Sort-Object | Where-Object {$_ -lt (Get-Date -Format HH:mm).ToString()} | Select-Object -Last 1))
-        $PowerPriceDigits = ($Config.PowerPrices.($Config.PowerPrices | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Sort-Object | Where-Object {$_ -lt (Get-Date -Format HH:mm).ToString()} | Select-Object -Last 1)).ToString().Split(".")[1].Length
     }
     if ($Rates.BTC.$FirstCurrency) {
         if ($API) {$API.BTCRateFirstCurrency = $Rates.BTC.$FirstCurrency}
