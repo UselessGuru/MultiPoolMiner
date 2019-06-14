@@ -1,4 +1,4 @@
-﻿Set-Location (Split-Path $MyInvocation.MyCommand.Path)
+Set-Location (Split-Path $MyInvocation.MyCommand.Path)
 
 try {
     Add-Type -Path .\~OpenCL.dll -ErrorAction Stop
@@ -1253,6 +1253,7 @@ class Miner {
     hidden [Array]$Data = @()
     $ShowMinerWindow
     $IntervalMultiplier
+    $Intervals
     $ProcessId
     $PowerCost
     $PowerUsage
