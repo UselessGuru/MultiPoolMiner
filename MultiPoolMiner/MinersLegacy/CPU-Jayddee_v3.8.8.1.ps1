@@ -8,8 +8,8 @@ param(
 )
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
-$HashSHA256 = "3DEC184FA2E26CF3A474FDFFED8FF1AD61A51E9E7A85D48547FE99C801FB7380"
-$Uri = "https://github.com/JayDDee/cpuminer-opt/files/1996977/cpuminer-opt-3.8.8.1-windows.zip"
+$HashSHA256 = "E7F3DC2AC4310D687FED291A8CC761E846F454D9F57033209BAE48A890E8154E"
+$Uri = "https://github.com/JayDDee/cpuminer-opt/releases/download/v3.9.4/cpuminer-opt-3.9.4-windows.zip"
 $ManualUri = "https://github.com/JayDDee/cpuminer-opt"
 
 $Miner_Version = Get-MinerVersion $Name
@@ -28,8 +28,11 @@ else {
         "hodl"          = "" # hodlcoin
         "m7m"           = "" #m7m
         "x12"           = "" #x12
+        "yespower"      = "" #Yespower
+        "yespowerr16"   = "" #YespowerR16
         "yescrypt"      = "" #Yescrypt
-        "yescryptr16"   = "" #yescryptr16, YENTEN
+        "yescryptr16"   = "" #YescryptR16
+
 
         ### MAYBE PROFITABLE ALGORITHMS - NOT MINEABLE IN SUPPORTED POOLS AS OF 30/03/20198
         ### these algorithms are not mineable on supported pools but may be profitable
