@@ -27,12 +27,12 @@ if ($CUDAVersion -and [System.Version]$CUDAVersion -lt [System.Version]$Required
 }
 
 if ($CUDAVersion -lt [System.Version]("10.0.0")) {
-    $HashSHA256 = "628FD49E290BB8243BCBE3EF7AAA4ACC45ED311C2A6A7E0ACA9DB7B77566F9A2"
-    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.11.1/t-rex-0.11.1-win-cuda9.2.zipp"
+    $HashSHA256 = "EDB907278F8EB66C133B59F2E84F001CE75EF4D66FEB89545B3A8BCE987FA2E3"
+    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.12.0/t-rex-0.12.0-win-cuda9.2.zip"
 }
 else {
-    $HashSHA256 = "0ABC6E18EF038FC4551AFD738D53BBCE51F021CF046183F04E6C42CB32D525B4"
-    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.11.1/t-rex-0.11.1-win-cuda10.0.zip"
+    $HashSHA256 = "DCD4D044BED972EF5B0B322B1A07ABD84E57DED78BF56A7FDC3D41E1D0B3BE6A"
+    $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.12.0/t-rex-0.12.0-win-cuda10.0.zip"
 }
 
 #Commands from config file take precedence
@@ -68,6 +68,7 @@ else {
         "x21s"       = "" #X21s, new in 0.8.3
         "x22i"       = "" #X22i, new in 0.7.2
         "x25x"       = "" #X25x, new in 0.11.0
+        "honeycomb"  = "" #Honeycomb, new in 0.12.0
     }
 }
 
