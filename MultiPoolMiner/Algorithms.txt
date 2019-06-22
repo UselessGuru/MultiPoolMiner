@@ -176,7 +176,6 @@
     "groestlcoin":  "Groestl",
     "hmq1725":  "HMQ1725",
     "hodlcoin":  "Hodl",
-    "honeycomb":  "Honeycomb",
     "hppcoin":  "Lyra2h",
     "hsr":  "HSR",
     "intense":  "CryptonightV7",
