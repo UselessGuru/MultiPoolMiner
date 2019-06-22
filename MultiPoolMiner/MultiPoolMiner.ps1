@@ -77,6 +77,9 @@ param(
     [Parameter(Mandatory = $false)]
     [Double]$SwitchingPrevention = 1, #zero does not prevent miners switching
     [Parameter(Mandatory = $false)]
+    [ValidateRange(0, 1)]
+    [Double]$MinAccuracy = 0.5, #Only pools with prices accuracy greater than the configured value. Allowed values: 0.0 - 1.0 (0% - 100%)
+    [Parameter(Mandatory = $false)]
     [Switch]$ShowMinerWindow = $false, #if true most miner windows will be visible (they can steal focus) - miners that use the 'Wrapper' API will still remain hidden
     [Parameter(Mandatory = $false)]
     [Switch]$ShowAllMiners = $false, #Use only use fastest miner per algo and device index. E.g. if there are 2 miners available to mine the same algo, only the faster of the two will ever be used, the slower ones will also be hidden in the summary screen
@@ -224,9 +227,6 @@ $UserNameDonate = ((@("uselessguru") * 3) + (@("uselessguru") * 2) + (@("useless
 #Set process priority to BelowNormal to avoid hash rate drops on systems with weak CPUs
 (Get-Process -Id $PID).PriorityClass = "BelowNormal"
 
-#HWiNFO64 ready? If HWiNFO64 is running it will recreate the reg key automatically
-if (Test-Path "HKCU:\Software\HWiNFO64\VSB") {Remove-Item -Path "HKCU:\Software\HWiNFO64\VSB" -Recurse -ErrorAction SilentlyContinue}
-
 while (-not $API.Stop) {
     #Reduce memory
     [GC]::Collect()
@@ -310,12 +310,14 @@ while (-not $API.Stop) {
     #API start
     if ($Config.APIPort) {
         if (-not $API.Port) {
-            try {
-                if ((New-Object Net.Sockets.TcpClient "localhost", $Config.APIPort).Connected) {
-                    Write-Log -Level Error "Error starting web dashboard and API on port $($Config.APIPort). Port is in use. "
-                }
+            $TCPClient = New-Object System.Net.Sockets.TCPClient
+            $AsyncResult = $TCPClient.BeginConnect("localhost", $Config.APIPort, $null, $null)
+            if ($AsyncResult.AsyncWaitHandle.WaitOne(100)) {
+                Write-Log -Level Error "Error starting web dashboard and API on port $($Config.APIPort). Port is in use. "
+                try {$Null = $TCPClient.EndConnect($AsyncResult)}
+                catch {}
             }
-            catch {
+            else {
                 #Start API server
                 Remove-Variable API -ErrorAction SilentlyContinue
                 Start-APIServer -Port $Config.APIPort
@@ -333,6 +335,8 @@ while (-not $API.Stop) {
                     $API = @{}
                 }
             }
+            Remove-Variable AsyncResult
+            Remove-Variable TCPClient
         }
     }
     #Start monitoring service, requires running API
@@ -431,7 +435,6 @@ while (-not $API.Stop) {
 
     #Power cost preparations
     $PowerPrice = [Double]0
-    $PowerPriceDigits = (Get-Culture).NumberFormat.CurrencyDecimalDigits
     $PowerCostBTCperW = [Double]0
     $BasePowerCost = [Double]0
     if ($Config.MeasurePowerUsage) {
@@ -515,6 +518,7 @@ while (-not $API.Stop) {
     if (($Config | ConvertTo-Json -Compress -Depth 10) -ne ($OldConfig | ConvertTo-Json -Compress -Depth 10)) {$AllPools = $null}
     $OldestAcceptedPoolData = (Get-Date).ToUniversalTime().AddHours( -24)# Allow only pools which were updated within the last 24hrs
     $AllPools = @($NewPools) + @(Compare-Object @($NewPools | Select-Object -ExpandProperty Name -Unique) @($AllPools | Select-Object -ExpandProperty Name -Unique) | Where-Object SideIndicator -EQ "=>" | Select-Object -ExpandProperty InputObject | ForEach-Object {$AllPools | Where-Object Name -EQ $_}) | 
+        Where-Object {$_.MarginOfError -le (1 - $Config.MinAccuracy)} |
         Where-Object {$Config.PoolName.Count -eq 0 -or (Compare-Object $Config.PoolName $_.Name -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} |
         Where-Object {$Config.ExcludePoolName.Count -eq 0 -or (Compare-Object $Config.ExcludePoolName $_.Name -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} |
         Where-Object {$Config.Algorithm.Count -eq 0 -or (Compare-Object @($Config.Algorithm | Select-Object) @($_.Algorithm | Select-Object) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
@@ -600,7 +604,7 @@ while (-not $API.Stop) {
     if ($Balances_Jobs) {
         $Balances = @($Balances_Jobs | Receive-Job -Wait -AutoRemoveJob -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Content | Sort-Object Name)
         $Balances_Jobs = $null
-        if ($API) {$API.Balances_Jobs = $null}
+        if ($API) {$API.Balances_Jobs = $Balances_Jobs}
     }
 
     #Update the exchange rates
@@ -633,7 +637,7 @@ while (-not $API.Stop) {
         $API.Balances = $Balances #Give API access to the pool balances
         $API.Rates = $Rates #Give API access to the exchange rates
     }
-    
+
     #Power price
     if ($Config.PowerPrices | Sort-Object | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name) {
         if ($null -eq $Config.PowerPrices."00:00") {
@@ -1186,11 +1190,11 @@ while (-not $API.Stop) {
 
     if ($MiningEarning -lt $MiningCost) {
         #Mining causes a loss
-        Write-Host -BackgroundColor Yellow -ForegroundColor Black "Mining is currently NOT profitable and causes a loss of $FirstCurrency $(($MiningEarning - $MiningCost).ToString("N$($PowerPriceDigits)"))/day (Earning: $($MiningEarning.ToString("N$($PowerPriceDigits)"))/day; Cost: $($MiningCost.ToString("N$($PowerPriceDigits)"))/day$(if ($Config.BasePowerUsage) {"; base power cost of $FirstCurrency $(($BasePowerCost * $Rates.BTC.$FirstCurrency).ToString("N$($PowerPriceDigits)"))/day for $($Config.BasePowerUsage)W is included in the calculation"})). "
+        Write-Host -BackgroundColor Yellow -ForegroundColor Black "Mining is currently NOT profitable and causes a loss of $FirstCurrency $(($MiningEarning - $MiningCost).ToString("N$((Get-Culture).NumberFormat.CurrencyDecimalDigits)"))/day (Earning: $($MiningEarning.ToString("N$((Get-Culture).NumberFormat.CurrencyDecimalDigits)"))/day; Cost: $($MiningCost.ToString("N$((Get-Culture).NumberFormat.CurrencyDecimalDigits)"))/day$(if ($Config.BasePowerUsage) {"; base power cost of $FirstCurrency $(($BasePowerCost * $Rates.BTC.$FirstCurrency).ToString("N$((Get-Culture).NumberFormat.CurrencyDecimalDigits)"))/day for $($Config.BasePowerUsage)W is included in the calculation"})). "
     }
     if (($MiningEarning - $MiningCost) -lt $Config.ProfitabilityThreshold -and $MinersNeedingBenchmark.Count -eq 0 -and $MinersNeedingPowerUsageMeasurement.count -eq 0) {
         #Mining at loss
-        Write-Host -BackgroundColor Yellow -ForegroundColor Black "Mining profit is below the configured threshold of $FirstCurrency $($Config.ProfitabilityThreshold.ToString("N$($PowerPriceDigits)"))/day; mining is suspended until threshold is reached."
+        Write-Host -BackgroundColor Yellow -ForegroundColor Black "Mining profit is below the configured threshold of $FirstCurrency $($Config.ProfitabilityThreshold.ToString("N$((Get-Culture).NumberFormat.CurrencyDecimalDigits)"))/day; mining is suspended until threshold is reached."
     }
 
     #Reduce memory
