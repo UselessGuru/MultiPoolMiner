@@ -12,6 +12,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 **Parameter '-UseDeviceNameForStatsFileNaming' is no longer valid**
 
 **'-UseDeviceNameForStatsFileNaming:true will be enforced**
+
 This will trigger all benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
 
 #### Core changes
