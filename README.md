@@ -14,8 +14,8 @@ Please also report if all is working fine - only so I can know that we get rid o
 This will trigger all benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
 
 #### Core changes
-- Added parameter '-DisableMinersWithDevFee'
 - Added config item 'DevicePciOrderMapping' for configurations where PCI deviceID order does not match OpenCL deviceID order (see README)
+- Added parameter '-DisableMinersWithDevFee'
 - API: updated to version 0.95; added '/alldevices', '/allminers' & '/intervals'
 - Fixed miners Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig; device enumeration can now use mapping as configured by 'DevicePciOrderMapping' 
 - Improved config file validation
