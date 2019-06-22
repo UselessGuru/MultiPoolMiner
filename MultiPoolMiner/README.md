@@ -7,7 +7,7 @@
 
 ###### Licensed under the GNU General Public License v3.0 - Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/LICENSE
 
-README.md is based on README.txt - updated on 22/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
+README.md is based on README.txt - updated on 23/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
 
 
 
@@ -124,7 +124,7 @@ Use only miners that do not have a dev fee built in
 Disable miner developer fees (Note: not all miners support turning off their built in fees, others will reduce the hashrate); this is also a per-miner setting (see Advanced Configuration)
 
 **-Donate**
-Donation of mining time in minutes per day to aaronsace. Default is 24, minimum is 10 minutes per day (less than 0.7% fee). The downloaded miner software can have their own donation system built in. Check the readme file of the respective miner used for more details.
+Donation of mining time in minutes per day to aaronsace. Default is 24, minimum is 10 minutes per day (less than 0.7% fee). If Interval is set higher than the donation time, the interval will prime. The downloaded miner software can have their own donation system built in. Check the readme file of the respective miner used for more details.
 
 **-ExcludeAlgorithm**
 Similar to the *-Algorithm* command but it is used to *exclude* unwanted algorithms. Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms; this is also a per-pool setting (see Advanced Configuration). Use commas to separate multiple values.
@@ -165,11 +165,15 @@ Include this command to ignore the power costs when calculating profit. MPM will
 
 **-Interval**
 MultiPoolMiner's update interval in seconds. This is an universal timer for running the entire script (downloading/processing APIs, calculation etc). It also determines how long a benchmark is run for each miner file (miner/algorithm/coin). Default is 60.
-Note: This value correlates with *-Interval*. If you set *-Interval* too short, then MPM cannot get enough samples for reliable measurement (anything over 10 is fine). In this case increase the interval length.
+Note: This value correlates with *-MinHashRateSamples*. If you set *-MinHashRateSamples* too short, then MPM cannot get enough samples for reliable measurement (anything over 10 is fine). In this case increase the interval length.
 
 **-MeasurePowerUsage**
 Include this command to to gather power usage per device. This is a pre-requisite to calculate power costs and effective earnings. 
 Note: This requires advanced configuration steps (see ConfigHWinfo64.pdf)
+
+**-MinAccuracy**
+Only pools with price accuracy greater than the configured value. Allowed values: 0 - 1 (default is 0.5 = 50%)
+Sometimes pools report erroneously high price spikes, just to self-correct after a few intervals. A value of 0.5 will ignore any princing information with a margin of error greater than 50%.
 
 **-MinerName**
 Specify to only include (restrict to) certain miner applications.
@@ -425,6 +429,7 @@ Warning: The JSON file structure is very fragile - every comma counts, so be car
   "InformationVariable": "$InformationVariable",
   "Interval": "$Interval",
   "MeasurePowerUsage": "$MeasurePowerUsage",
+  "MinAccuracy": 0.5,
   "MinerName": "$MinerName",
   "MinerStatusKey": "$MinerStatusKey",
   "MinerStatusUrl": "$MinerStatusUrl",
