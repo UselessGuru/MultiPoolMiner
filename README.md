@@ -40,7 +40,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Updated AMD-TeamRed_v0.5.2
 - Updated AMD-WildRig_v0.17.8; support for Blake2b-BTCC, Blake2b-Glt & Skein2
 - Updated AMD-XmrigCryptonight_v2.14.4
-- Updated CPU-Jayddee_v3.9.3.1; support for Lyra2rev3, Sha256q & Sonoa
+- Updated CPU-Jayddee_v3.9.4; support for Lyra2rev3, Sha256q, Sonoa, Yespower, YespowerR16 & Yescryptr16
 - Updated CPU-JCECryptonote_v0.33q; changed API to XmRig
 - Updated CPU-XmrigCryptonight_v2.14.4
 - Updated NVIDIA-CcminerMTP_v1.1.20
