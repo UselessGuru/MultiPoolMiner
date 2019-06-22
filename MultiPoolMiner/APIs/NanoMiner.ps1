@@ -61,19 +61,23 @@ class NanoMiner : Miner {
         $Server = "localhost"
         $Timeout = 5 #seconds
 
-        $Request = ""
+        $Request = "http://$($Server):$($this.Port)/stats"
         $Response = ""
 
-        $HashRate = [PSCustomObject]@{}
-
         try {
-            $Response = Invoke-WebRequest "http://$($Server):$($this.Port)/stats" -UseBasicParsing -TimeoutSec $Timeout -ErrorAction Stop
+            $WebClient = New-Object TimeoutWebClient
+            $WebClient.TimeoutSeconds = $TimeOut
+            $Response = $WebClient.DownloadString($Request)
             $Data = $Response | ConvertFrom-Json -ErrorAction Stop
         }
         catch {
             return @($Request, $Response)
         }
+        finally {
+            $WebClient.Dispose()
+        }
 
+        $HashRate = [PSCustomObject]@{}
         $HashRate_Name = [String]($this.Algorithm | Select-Object -Index 0)
 
         if ($this.AllowedBadShareRatio) {
@@ -87,8 +91,7 @@ class NanoMiner : Miner {
             }
         }
 
-        $HashRate_Value = [Double](($Data.Algorithms | Select-Object -Index 0).(($Data.Algorithms | Select-Object -Index 0) | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name).Total.Hashrate)
-        $HashRate | Add-Member @{$HashRate_Name = [Double]$HashRate_Value}
+        $HashRate | Add-Member @{$HashRate_Name = [Double](($Data.Algorithms | Select-Object -Index 0).(($Data.Algorithms | Select-Object -Index 0) | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name).Total.Hashrate)}
 
         if ($HashRate.PSObject.Properties.Value -gt 0) {
             $this.Data += [PSCustomObject]@{

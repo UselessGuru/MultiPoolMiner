@@ -1,0 +1,36 @@
+Feature request: Option for device enumeration based on OpenCL device order
+
+Currently nanominer sorts the devices by PCI busID. 
+Unfortunately the PCI BusID information is not available through the OpenCL API which, as a consequence, breaks proper integration on MultiPoolMiner based software (e.g. MultipoolMiner, Nemos Miner etc.).
+Could you please add an option (e.g. - --deviceOrder OpenCL) which will allow nanominer to sort the devices based on OpenCL device ID?
+
+OpenCL device order in my case is:
+```
+GPU#00 GeForce GTX 1080 Ti
+GPU#01 GeForce GTX 1060 6GB
+GPU#02 Radeon RX 580 Series (Ellesmere)
+GPU#03 AMD Radeon (TM) RX 560 (Baffin)
+```
+
+Nanominer now:
+```
+nanominer -d
+2019-06-10 07:36:23: CUDA driver version is 10.2, runtime version is 10.0
+Detected 4 devices:
+GPU 0  PCI 01:00.0  11264 MB  GeForce GTX 1080 Ti
+GPU 1  PCI 04:00.0  6144 MB  GeForce GTX 1060 6GB
+GPU 2  PCI 05:00.0  2048 MB  AMD Radeon (TM) RX 560 (Baffin)
+GPU 3  PCI 09:00.0  8192 MB  Radeon RX 580 Series (Ellesmere)
+```
+
+Preferred result:
+
+```
+nanominer -d
+2019-06-10 07:36:23: CUDA driver version is 10.2, runtime version is 10.0
+Detected 4 devices:
+GPU 0  PCI 01:00.0  11264 MB  GeForce GTX 1080 Ti
+GPU 1  PCI 04:00.0  6144 MB  GeForce GTX 1060 6GB
+GPU 2  PCI 09:00.0  8192 MB  Radeon RX 580 Series (Ellesmere)
+GPU 3  PCI 05:00.0  2048 MB  AMD Radeon (TM) RX 560 (Baffin)
+```

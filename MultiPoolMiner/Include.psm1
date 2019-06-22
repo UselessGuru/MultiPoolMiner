@@ -1,4 +1,4 @@
-Set-Location (Split-Path $MyInvocation.MyCommand.Path)
+﻿Set-Location (Split-Path $MyInvocation.MyCommand.Path)
 
 try {
     Add-Type -Path .\~OpenCL.dll -ErrorAction Stop
@@ -34,8 +34,36 @@ catch {
     Add-Type -Path .\~CPUID.dll
 }
 
-#Update device status in API
+#Add timeout to Web Client Code
+#https://vandsh.github.io/powershell/2018/01/08/webclient-with-timeout.html
+$TimeoutWebclientCode = @"
+using System.Net;
+
+public class TimeoutWebClient : WebClient
+{
+    public int TimeoutSeconds;
+
+    protected override WebRequest GetWebRequest(System.Uri address)
+    {
+        WebRequest request = base.GetWebRequest(address);
+        if (request != null)
+        {
+           request.Timeout = TimeoutSeconds * 1000;
+        }
+        return request;
+    }
+
+    public TimeoutWebClient()
+    {
+        TimeoutSeconds = 300; // Timeout value by default
+    }
+}
+"@;
+Add-Type -TypeDefinition $TimeoutWebclientCode -Language CSharp
+
 function Update-APIDeviceStatus {
+
+    #Update device status in API
 
     [CmdletBinding()]
     param(
@@ -62,8 +90,10 @@ function Update-APIDeviceStatus {
     }
 }
 
-#Get Pre / Post miner exec commands
 function Get-PrePostCommand {
+
+    #Get Pre / Post miner exec commands
+
 
     [CmdletBinding()]
     param(
@@ -86,8 +116,9 @@ function Get-PrePostCommand {
 
 }
 
-#Pre / Post miner exec commands
 function Start-PrePostCommand {
+
+    #Pre / Post miner exec commands
 
     [CmdletBinding()]
     param(
@@ -122,8 +153,10 @@ function Start-PrePostCommand {
     }
 }
 
-# Brief : gets CPUID (CPU name and registers)
 function Get-CpuId {
+
+    # Brief : gets CPUID (CPU name and registers)
+
     #OS Features
     $OS_x64 = "" #not implemented
     $OS_AVX = "" #not implemented
@@ -248,21 +281,20 @@ function Get-CpuId {
 
 function Get-PowerUsage {
 
-# Reads current power draw from devices
-#
-# returned values are:
-# PowerDraw:    0 - max (in watts)
-#
-# Requirement: Running instance of HWiNFO64
-# https://www.hwinfo.com/download/
-#
-# For each device (CPU & GPU) the power usage sensor must be exposed to the HWiNFO Gadget
-# and the power sensor name must end in $DeviceName as found in the web GUI (http://localhost:3999/devices.html)
-# e.g. GPU Chip Power (RX 580) GPU#00
-#
-# For details see ConfigHWinfo64.pdf
-
-[CmdletBinding()]
+    # Reads current power draw from devices
+    #
+    # returned values are:
+    # PowerDraw:    0 - max (in watts)
+    #
+    # Requirement: Running instance of HWiNFO64
+    # https://www.hwinfo.com/download/
+    #
+    # For each device (CPU & GPU) the power usage sensor must be exposed to the HWiNFO Gadget
+    # and the power sensor name must end in $DeviceName as found in the web GUI (http://localhost:3999/devices.html)
+    # e.g. GPU Chip Power (RX 580) GPU#00
+    #
+    # For details see ConfigHWinfo64.pdf
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [String[]]$DeviceNames
@@ -668,6 +700,64 @@ function Get-ChildItemContent {
     else {$Job | Receive-Job -Wait -AutoRemoveJob}
 }
 
+function Get-ChildItemContent2 {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [String]$Path, 
+        [Parameter(Mandatory = $false)]
+        [Hashtable]$Parameters = @{}, 
+        [Parameter(Mandatory = $false)]
+        [Switch]$Threaded = $false
+    )
+
+    function Invoke-ExpressionRecursive ($Expression) {
+        if ($Expression -is [String]) {
+            if ($Expression -match '^\$[A-Za-z]') {
+                try {$Expression = Invoke-Expression $Expression}
+                catch {$Expression = Invoke-Expression "`"$Expression`""} 
+            }
+        }
+        elseif ($Expression -is [PSCustomObject]) {
+            $Expression | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name | ForEach-Object {
+                $Expression.$_ = Invoke-ExpressionRecursive $Expression.$_
+            }
+        }
+        return $Expression
+    }
+
+    Get-ChildItem $Path -File -ErrorAction SilentlyContinue | ForEach-Object {
+        $Name = $_.BaseName
+        $Content = @()
+        if ($_.Extension -eq ".ps1") {
+            $Content = & {
+                $Parameters.Keys | ForEach-Object {Set-Variable $_ $Parameters.$_}
+                & $_.FullName @Parameters
+            }
+        }
+        else {
+            $Content = & {
+                $Parameters.Keys | ForEach-Object {Set-Variable $_ $Parameters.$_}
+                try {
+                    ($_ | Get-Content | ConvertFrom-Json) | ForEach-Object {Invoke-ExpressionRecursive $_}
+                }
+                catch [ArgumentException] {
+                    $null
+                }
+            }
+            if ($null -eq $Content) {$Content = $_ | Get-Content}
+        }
+        $Content | ForEach-Object {
+            if ($_.Name) {
+                [PSCustomObject]@{Name = $_.Name; Content = $_}
+            }
+            else {
+                [PSCustomObject]@{Name = $Name; Content = $_}
+            }
+        }
+    }
+}
+
 function Get-MinerVersion {
     [CmdletBinding()]
     param(
@@ -703,10 +793,11 @@ filter ConvertTo-Hash {
 }
 
 function ConvertTo-LocalCurrency { 
-    [CmdletBinding()]
+
     # To get same numbering scheme regardless of value BTC value (size) to determine formatting
     # Use $Offset to add/remove decimal places
 
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [Double]$Value, 
@@ -935,23 +1026,18 @@ function Invoke-TcpRequest {
         $Stream = $Client.GetStream()
         $Writer = New-Object System.IO.StreamWriter $Stream
         $Reader = New-Object System.IO.StreamReader $Stream
-        $client.SendTimeout = $Timeout * 1000
-        $client.ReceiveTimeout = $Timeout * 1000
+        $Client.SendTimeout = $Timeout * 1000
+        $Client.ReceiveTimeout = $Timeout * 1000
         $Writer.AutoFlush = $true
 
         $Writer.WriteLine($Request)
-        if ($ReadToEnd) {
-            $Response = $Reader.ReadToEnd()
-        }
-        else {
-            $Response = $Reader.ReadLine()
-        }
+        if ($ReadToEnd) {$Response = $Reader.ReadToEnd()} else {$Response = $Reader.ReadLine()}
     }
     finally {
-        if ($Reader) {$Reader.Close()}
-        if ($Writer) {$Writer.Close()}
-        if ($Stream) {$Stream.Close()}
-        if ($Client) {$Client.Close()}
+        if ($Reader) {$Reader.Close(); $Reader.Dispose()}
+        if ($Writer) {$Writer.Close(); $Writer.Dispose()}
+        if ($Stream) {$Stream.Close(); $Stream.Dispose()}
+        if ($Client) {$Client.Close(); $Client.Dispose()}
     }
 
     $Response
@@ -969,6 +1055,32 @@ function Get-Device {
         [Parameter(Mandatory = $false)]
         [Switch]$Refresh = $false
     )
+
+    Function Get-BusFunctionID { 
+
+        #gwmi -query "SELECT * FROM Win32_PnPEntity"
+        Get-WMIObject -Namespace root\cimv2 -Class Win32_PnPEntity | ForEach-Object {
+
+            if ($_.PNPDeviceID -like "PCI\*") {
+
+                $DeviceId = $_.PNPDeviceID
+                $LocationInfo = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Enum\$DeviceID" -Name locationinformation).locationInformation
+
+                if ($LocationInfo -match  "\d+,\d+,\d+") {
+                    $BusId, $DeviceID, $FunctionID = $matches[0] -split ","
+
+                    [PSCustomObject]@{  
+                        "Name"       = $_.Name
+                        "PnPClass"   = $_.PNPClass
+                        "PnPID"      = $_.PNPDeviceID
+                        "BusID"      = $BusId
+                        "DeviceID"   = $DeviceID
+                        "FunctionID" = $FunctionID
+                    }
+                }
+            }
+        }
+    } 
 
     if ($Name) {
         $DeviceList = Get-Content "Devices.txt" | ConvertFrom-Json

@@ -7,31 +7,43 @@ class BMiner : Miner {
         $Server = "localhost"
         $Timeout = 5 #seconds
 
-        $Request = ""
+        $Request = "http://$($Server):$($this.Port)/api/v1/status/solver"
         $Response = ""
 
-        $HashRate_Name = ""
-        $HashRate_Value = 0
-        $HashRate = [PSCustomObject]@{}
         try {
-            $Response = Invoke-WebRequest "http://$($Server):$($this.Port)/api/v1/status/solver" -UseBasicParsing -TimeoutSec $Timeout -ErrorAction Stop
+            $WebClient = New-Object TimeoutWebClient
+            $WebClient.TimeoutSeconds = $TimeOut
+            $Response = $WebClient.DownloadString($Request)
             $Data = $Response | ConvertFrom-Json -ErrorAction Stop
         }
         catch {
             return @($Request, $Response)
         }
+        finally {
+            $WebClient.Dispose()
+        }
 
         if ($this.AllowedBadShareRatio) {
+            $Request = "http://$($Server):$($this.Port)/api/v1/status/stratum"
             #Read stratum info from API
             try {
-                $Response = Invoke-WebRequest "http://$($Server):$($this.Port)/api/v1/status/stratum" -UseBasicParsing -TimeoutSec $Timeout -ErrorAction Stop
+                $WebClient = New-Object TimeoutWebClient
+                $WebClient.TimeoutSeconds = $TimeOut
+                $Response = $WebClient.DownloadString($Request)
                 $Data | Add-member stratums ($Response | ConvertFrom-Json -ErrorAction Stop).stratums
             }
             catch {
-                if ((Get-Date) -gt ($this.Process.PSBeginTime.AddSeconds($this.WarmupTime))) {$this.SetStatus("Failed")}
-                return @($Request, $Response, "Reason: Could not retrieve data from API ")
+                    if ((Get-Date) -gt ($this.Process.PSBeginTime.AddSeconds($this.WarmupTime))) {$this.SetStatus("Failed")}
+                    return @($Request, $Response, "Reason: Could not retrieve data from API ")
+            }
+            finally {
+                $WebClient.Dispose()
             }
         }        
+
+        $HashRate = [PSCustomObject]@{}
+        $HashRate_Name = ""
+        $HashRate_Value = 0
 
         $this.Algorithm | Select-Object -Unique | ForEach-Object {
 

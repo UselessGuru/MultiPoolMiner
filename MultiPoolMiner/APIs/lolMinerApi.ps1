@@ -7,21 +7,25 @@ class lolMinerApi : Miner {
         $Server = "localhost"
         $Timeout = 5 #seconds
 
-        $Request = ""
+        $Request = "http://$($Server):$($this.Port)/summary"
         $Response = ""
 
         $Data = [PSCustomObject]@{}
 
-        $HashRate = [PSCustomObject]@{}
-
         try {
-            $Response = Invoke-WebRequest "http://$($Server):$($this.Port)/summary" -UseBasicParsing -TimeoutSec $Timeout -ErrorAction SilentlyContinue
-            $Data = $Response | ConvertFrom-Json -ErrorAction SilentlyContinue
+            $WebClient = New-Object TimeoutWebClient
+            $WebClient.TimeoutSeconds = $TimeOut
+            $Response = $WebClient.DownloadString($Request)
+            $Data = $Response | ConvertFrom-Json -ErrorAction Stop
         }
         catch {
             return @($Request, $Response)
         }
+        finally {
+            $WebClient.Dispose()
+        }
 
+        $HashRate = [PSCustomObject]@{}
         $HashRate_Name = [String]($this.Algorithm | Select-Object -Index 0)
 
         if ($this.AllowedBadShareRatio) {

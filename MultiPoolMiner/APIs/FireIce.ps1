@@ -148,19 +148,23 @@ class Fireice : Miner {
         $Server = "localhost"
         $Timeout = 5 #seconds
 
-        $Request = ""
+        $Request = "http://$($Server):$($this.Port)/api.json"
         $Response = ""
 
-        $HashRate = [PSCustomObject]@{}
-
         try {
-            $Response = Invoke-WebRequest "http://$($Server):$($this.Port)/api.json" -UseBasicParsing -TimeoutSec $Timeout -ErrorAction Stop
+            $WebClient = New-Object TimeoutWebClient
+            $WebClient.TimeoutSeconds = $TimeOut
+            $Response = $WebClient.DownloadString($Request)
             $Data = $Response | ConvertFrom-Json -ErrorAction Stop
         }
         catch {
             return @($Request, $Response)
         }
+        finally {
+            $WebClient.Dispose()
+        }
 
+        $HashRate = [PSCustomObject]@{}
         $HashRate_Name = [String]($this.Algorithm | Select-Object -Index 0)
 
         if ($this.AllowedBadShareRatio) {

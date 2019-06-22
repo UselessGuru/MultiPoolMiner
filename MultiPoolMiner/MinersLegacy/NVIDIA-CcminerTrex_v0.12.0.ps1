@@ -27,11 +27,11 @@ if ($CUDAVersion -and [System.Version]$CUDAVersion -lt [System.Version]$Required
 }
 
 if ($CUDAVersion -lt [System.Version]("10.0.0")) {
-    $HashSHA256 = "EDB907278F8EB66C133B59F2E84F001CE75EF4D66FEB89545B3A8BCE987FA2E3"
+    $HashSHA256 = "115A5D8109C8BA6384A210F0312BED872A9B5878252B0A1D84A85499033B3C06"
     $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.12.0/t-rex-0.12.0-win-cuda9.2.zip"
 }
 else {
-    $HashSHA256 = "DCD4D044BED972EF5B0B322B1A07ABD84E57DED78BF56A7FDC3D41E1D0B3BE6A"
+    $HashSHA256 = "E34A713057369561C37ECCED84BA3F7243F13EFBB26CD7EB9099A5E569271BC7"
     $Uri = "https://github.com/trexminer/T-Rex/releases/download/0.12.0/t-rex-0.12.0-win-cuda10.0.zip"
 }
 
@@ -47,6 +47,7 @@ else {
         "dedal"      = "" #Dedal, new in 0.8.2
         "geek"       = "" #Geek, new in 0.8.0
         "hmq1725"    = "" #Hmq1725, new in 0.6.4
+        "honeycomb"  = "" #Honeycomb, new in 12.0
         "jeonghash"  = "" #GltJeongHash, new in 0.8.6
         "lyra2z"     = "" #Lyra2z
         "mtp"        = "" #MTP, new in 0.10.2
@@ -68,7 +69,6 @@ else {
         "x21s"       = "" #X21s, new in 0.8.3
         "x22i"       = "" #X22i, new in 0.7.2
         "x25x"       = "" #X25x, new in 0.11.0
-        "honeycomb"  = "" #Honeycomb, new in 0.12.0
     }
 }
 

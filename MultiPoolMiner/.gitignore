@@ -1,0 +1,12 @@
+bin/
+downloads/
+logs/
+stats/
+wrapper/
+*.7z
+*.dll
+*.rar
+*.zip
+Config.txt
+SnakeTail.exe
+MPM_SnakeTail_LogReader.xml
