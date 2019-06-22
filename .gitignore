@@ -1,9 +1,8 @@
 *.bak
 *.dll
 *.lnk
-MultiPoolMiner/_web
 MultiPoolMiner/Bin
-MultiPoolMiner/Debug
+MultiPoolMiner/Dev
 MultiPoolMiner/Downloads
 MultiPoolMiner/Logs
 MultiPoolMiner/Stats
