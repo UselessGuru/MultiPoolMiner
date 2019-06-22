@@ -2,7 +2,7 @@
 https://github.com/MultiPoolMiner/MultiPoolMiner
 
 Download link:
-https://github.com/MultiPoolMiner/MultiPoolMiner/archive/Version-3.4.0.zip
+https://github.com/UselessGuru/MultiPoolMiner/archive/master.zip
 
 Please also report if all is working fine - only so I can know that we get rid of all the bugs.
 
