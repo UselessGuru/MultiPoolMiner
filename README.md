@@ -19,7 +19,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - API: updated to version 0.95; added '/alldevices', '/allminers' & '/intervals'
 - Fixed miners Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig; device enumeration can now use mapping as configured by 'DevicePciOrderMapping' 
 - Improved config file validation
-- Parameters '-MinerName' and '-ExcludeMinerName' can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed'; MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.1' or MinerName, e.g. 'AMD-TeamRed_v0.5.1-1xEllesmere8GB'
+- Parameters '-MinerName' and '-ExcludeMinerName' can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed'; MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.2' or MinerName, e.g. 'AMD-TeamRed_v0.5.2-1xEllesmere8GB'
 - Removed code for '-UseDeviceNameForStatsFileNaming'
 - Renamed parameter '-NoDevFeeMiners' to '-DisableDevFeeMining' to better reflect its function
 - Rewrote interval & hashrate collector scheduler
@@ -30,7 +30,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Fixed NVIDIA-CcminerZenemy_v2.00; invalid --devices0 parameter (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-495972633)
 - Fixed AMD_NVIDIA-BMiner_v15.5.3 SSL for secondary algorithm
 - Renamed NVIDIA-CcminerZenemy_v2.00 to NVIDIA-CcminerZenemy_v20.0 (typo)
-- Removed CPU-Cryply_v3.8.8.4; (moved to 'Deprecated' folder); CPU-Jayddee_v3.9.3.1 is newer and has no dev fee
+- Removed CPU-Cryply_v3.8.8.4; (moved to 'Deprecated' folder); CPU-Jayddee_v3.9.4 is newer and has no dev fee
 - Updated AMD_CPU_NVIDIA-FireiceCryptonight_v2.10.5
 - Updated AMD_NVIDIA-ClaymoreEthash_v14.7
 - Updated AMD_NVIDIA-GminerEquihash_v1.47; support for Equihash 1255
