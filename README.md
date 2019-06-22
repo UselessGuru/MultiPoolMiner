@@ -1,4 +1,4 @@
-# This is the home of the MultiPoolMiner beta versions
+# This is the home of the MultiPoolMiner dev versions
 https://github.com/MultiPoolMiner/MultiPoolMiner
 
 Download link:
