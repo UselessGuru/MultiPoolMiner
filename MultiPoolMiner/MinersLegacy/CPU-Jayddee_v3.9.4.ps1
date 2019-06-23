@@ -32,6 +32,7 @@ else {
         "yespowerr16"   = "" #YespowerR16
         "yescrypt"      = "" #Yescrypt
         "yescryptr16"   = "" #YescryptR16
+        "lyra2z330"     = "" #Lyra2z330
 
 
         ### MAYBE PROFITABLE ALGORITHMS - NOT MINEABLE IN SUPPORTED POOLS AS OF 30/03/20198
