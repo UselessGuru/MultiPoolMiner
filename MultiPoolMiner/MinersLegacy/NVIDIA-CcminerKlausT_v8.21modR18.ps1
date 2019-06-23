@@ -43,6 +43,7 @@ else {
         "luffa"         = "" #Luffa
         "lyra2v2"       = "" #Lyra2RE2
         "lyra2v3"       = "" #Lyra2RE3
+        #"lyra2z330"    = " -i 10" #Lyra2z330 single gpu only, multicards rigs need work
         "neoscrypt"     = "" #NeoScrypt
         "penta"         = "" #Pentablake
         "s3"            = "" #S3
