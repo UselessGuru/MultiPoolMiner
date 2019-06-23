@@ -11,3 +11,6 @@ MultiPoolMiner/MPM_SnakeTail_LogReader.xml
 MultiPoolMiner/SnakeTail.exe
 MultiPoolMiner/_config.yml
 MultiPoolMiner/.vscode
+MultiPoolMiner/~OpenCL.dll
+MultiPoolMiner/~CPUID.dll
+MultiPoolMiner/~MonoTorrent.dll
