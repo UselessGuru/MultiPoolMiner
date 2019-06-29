@@ -7,7 +7,7 @@
 
 ###### Licensed under the GNU General Public License v3.0 - Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/LICENSE
 
-README.md is based on README.txt - updated on 23/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
+README.md is based on README.txt - updated on 29/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
 
 
 
@@ -67,7 +67,7 @@ Allowed ratio of bad shares (total / bad) as reported by the miner. If the ratio
 Port for the MPM API and web GUI. The miner port range will start from APIPort +1. Default is 3999
 
 **-Algorithm**
-Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms
+Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms. Use commas to separate multiple values.
 
 The following algorithms are currently supported:
 
@@ -95,7 +95,7 @@ By default this feature is turned on. To disable add '-CreateMinerInstancePerDev
 *Note that this will trigger some benchmarking.*
 
 **-CoinName [Zcash, ZeroCoin etc.]**
-Limit mining to the listed coins only; this is also a per-pool setting (see Advanced Configuration)
+Limit mining to the listed coins only; this is also a per-pool setting (see Advanced Configuration). Use commas to separate multiple values.
 Note: Only the pools ending in ...Coins expose the coin name in their API.
 
 **-ConfigFile [Path\ConfigFile.txt]**
@@ -104,8 +104,8 @@ If the config file does not exist MPM will create a config file with default val
 By default MPM will use the values from the command line. If you hardcode config values directly in the config file, then these values will override the command line parameters (see Advanced Configuration).
 
 **-Currency [BTC, USD, EUR, GBP, ETH ...]**
-Choose the default currency or currencies your profit stats will be shown in.
-Important: MultiPoolMiner will use the first currency in the list as main currency. All profit / earning numbers will be displayed in the main currency. Use commas to separate multiple values.
+Choose the default currency or currencies your profit stats will be shown in. Use commas to separate multiple values.
+Important: MultiPoolMiner will use the first currency in the list as main currency. All profit / earning numbers will be displayed in the main currency.
 Note: Instead af BTC you can also use mBTC (= BTC / 1000).
 
 **-Dashboard**
@@ -134,7 +134,7 @@ Similar to the *-CoinName* command but it is used to exclude selected coins from
 Note: Only the pools ending in ...Coins expose the coin name in their API.
 
 **-ExcludeDeviceName**
-Similar to the *-DeviceName* command but it is used to *exclude* unwanted devices for mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]. Use commas to separate multiple values.
+Similar to the *-DeviceName* command but it is used to *exclude* unwanted devices for mining. [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]. Use commas to separate multiple values.
 
 **-ExcludeMinerName**
 Similar to the *-MinerName* command but it is used to *exclude* certain miners you don't want to use. This is useful if a miner is causing issues with your machine. Use commas to separate multiple values.
@@ -511,6 +511,18 @@ E.g. To NOT mine Zcash & ZeroCoin at Zpool:
     }
 Note: Only the pools ending in ...Coins expose the coin name in their API.
 
+#### ExcludeRegion per pool
+Do not use the pool endpoints is select regions. This may be useful when a pool has a problem with its endpoints in some regions, e.g. https://bitcointalk.org/index.php?topic=472510.msg51637436#msg51637436.
+
+E.g. To not use the MiningPoolHub ming endpoints in region 'Europe':
+
+    "MiningPoolHub": {
+      "ExcludeRegion":  [
+        "Europe"
+      ]
+    }
+Note: The values for 'Regions' must match the definitions in 'Regions.txt'.
+
 #### MinWorker
 This parameter allows to define a required minimum number of workers at the pool per algorithm. If there are less then the configured number of workers MPM will skip the affected algorithms.
 Wildcards (* and ?) for the algorithm names are supported. If an algorithm name/wildcard matches more than one entry then the lower number takes priority.
@@ -566,6 +578,19 @@ E.g. You feel that Zpool is exaggerating its estimations by 10% - Set PricePenal
       ...
     }
 Note: This is also a general parameter (see *-PricePenaltyFactor*). If both parameters - general and pool - are present, then the pool parameter takes precedence.
+
+#### Regions per pool
+Only use the pool endpoints is selected regions. This may be useful a pools endpoints are only operational in some regions, e.g. https://bitcointalk.org/index.php?topic=472510.msg51637436#msg51637436.
+
+E.g. To use only the MiningPoolHub ming endpoints in regions 'Asia' and 'US':
+
+    "MiningPoolHub": {
+      "Region":  [
+        "Asia",
+        "US"
+      ]
+    }
+Note: The values for 'Regions' must match the definitions in 'Regions.txt'.
 
 #### NiceHash internal wallet
 
