@@ -18,6 +18,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Updated NVIDIA-CcminerKlausT_v8.21modR18.ps1; support for Lyra2z330
 
 #### Pool changes
+- Fixed MiningPoolHubCoins; pool did not return any pool objects
 - Removed Yiimp pool; closed since June 22nd 2019 (https://twitter.com/tpruvot)
 
 #### Changes in Algorithms.txt
