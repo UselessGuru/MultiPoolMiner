@@ -17,7 +17,7 @@ TWITTER: @multipoolminer
 Licensed under the GNU General Public License v3.0
 Permissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/LICENSE
 
-README.txt - updated on 23/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
+README.txt - updated on 29/06/2019 (dd/mm/yyyy) - latest version can be found here: https://github.com/MultiPoolMiner/MultiPoolMiner/blob/master/README.txt
 
 ====================================================================
 
@@ -83,7 +83,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	Port for the MPM API and web GUI. The miner port range will start from APIPort +1. Default is 3999
 
 -Algorithm
-	Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms
+	Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms. Use commas to separate multiple values.
 	The following algorithms are currently supported: 
 	   Bitcore, Blakecoin, Blake2s, BlakeVanilla, C11, CryptoNightV7, CryptoNightHeavy, Ethash, X11, Decred, Equihash, Groestl, HMQ1725, HSR, JHA, Keccak, Lbry, Lyra2RE2, Lyra2z, MyriadGroestl, NeoScrypt, Pascal, Phi, Phi2, Phi1612, Polytimos, Quark, Qubit, Scrypt, SHA256, Sib, Skunk, Skein, Timetravel, Tribus, Veltor, X11, X11evo, X16R, X16S, X17, Yescrypt
 	Note that the list of supported algorithms can change depending on the capabilities of the supported miner binaries. Some algos are now being mined with ASICs and are no longer profitable when mined with CPU/GPU and will get removed from MPM.
@@ -107,7 +107,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	Note that this will trigger some benchmarking.
 
 -CoinName [Zcash, ZeroCoin etc.]
-	Limit mining to the listed coins only; this is also a per-pool setting (see Advanced Configuration)
+	Limit mining to the listed coins only; this is also a per-pool setting (see Advanced Configuration). Use commas to separate multiple values.
 	Note: Only the pools ending in ...Coins expose the coin name in their API.
 
 -ConfigFile [Path\ConfigFile.txt]
@@ -116,7 +116,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	By default MPM will use the values from the command line. If you hardcode config values directly in the config file, then these values will override the command line parameters (see Advanced Configuration).
 
 -Currency [BTC, USD, EUR, GBP, ETH ...]
-	Choose the default currency or currencies your profit stats will be shown in.
+	Choose the default currency or currencies your profit stats will be shown in. Use commas to separate multiple values.
 	Important: MultiPoolMiner will use the first currency in the list as main currency. All profit / earning numbers will be displayed in the main currency.
     Note: Instead af BTC you can also use mBTC (= BTC / 1000).
 
@@ -127,7 +127,7 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	Specify the number of seconds required to pass before opening each miner. It is useful when cards are more sensitive to switching and need some extra time to recover (eg. clear DAG files from memory)
 
 -DeviceName
-	Choose the relevant GPU(s) and/or CPU mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]
+	Choose the relevant GPU(s) and/or CPU mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]. Use commas to separate multiple values.
 
 -DisableMinersWithDevFee
 	Use only miners that do not have a dev fee built in
@@ -139,14 +139,14 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
 	Donation of mining time in minutes per day to aaronsace. Default is 24, minimum is 10 minutes per day (less than 0.7% fee). If Interval is set higher than the donation time, the interval will prime. The downloaded miner software can have their own donation system built in. Check the readme file of the respective miner used for more details.
 	
 -ExcludeAlgorithm
-	Similar to the '-Algorithm' command but it is used to exclude unwanted algorithms. Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms
+	Similar to the '-Algorithm' command but it is used to exclude unwanted algorithms. Supported algorithms sorted by pool can be found at https://multipoolminer.io/algorithms. Use commas to separate multiple values.
 
 -ExcludeCoinName [Zcash, ZeroCoin etc.]
-	Similar to the '-CoinName' command but it is used to exclude selected coins from being mined; this is also a per-pool setting (see Advanced Configuration)	
+	Similar to the '-CoinName' command but it is used to exclude selected coins from being mined; this is also a per-pool setting (see Advanced Configuration). Use commas to separate multiple values.
 	Note: Only the pools ending in ...Coins expose the coin name in their API.
 
 -ExcludeDeviceName
-	Similar to the '-DeviceName' command but it is used to exclude unwanted devices for mining.  [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]
+	Similar to the '-DeviceName' command but it is used to exclude unwanted devices for mining. [CPU, GPU, GPU#02, AMD, NVIDIA, AMD#02, OpenCL#03#02 etc.]. Use commas to separate multiple values.
 
 -ExcludeMinerName
 	Similar to the '-MinerName' command but it is used to exclude certain miners you don't want to use. This is useful if a miner is causing issues with your machine. A full list of available miners and parameters used can be found here: https://multipoolminer.io/miners
@@ -515,6 +515,18 @@ E.g. To NOT mine Zcash & ZeroCoin at Zpool:
     }
 Note: Only the pools ending in ...Coins expose the coin name in their API.
 
+ExcludeRegion per pool
+Do not use the pool endpoints is select regions. This may be useful when a pool has a problem with its endpoints in some regions, e.g. https://bitcointalk.org/index.php?topic=472510.msg51637436#msg51637436.
+
+E.g. To not use the MiningPoolHub ming endpoints in region 'Europe':
+
+    "MiningPoolHub": {
+      "ExcludeRegion":  [
+        "Europe"
+      ]
+    }
+Note: The values for 'Regions' must match the definitions in 'Regions.txt'.
+
 MinWorker
 This parameter allows to define a required minimum number of workers at the pool per algorithm. If there are less then the configured number of workers MPM will skip the affected algorithms.
 Wildcards (* and ?) for the algorithm names are supported. If an algorithm name/wildcard matches more than one entry then the lower number takes priority.
@@ -568,6 +580,19 @@ E.g. You feel that Zpool is exaggerating its estimations by 10% - Set PricePenal
       ...
     }
 Note: This is also a general parameter (see -PricePenaltyFactor). If both parameters - general and pool - are present, then the pool parameter takes precedence.
+
+Regions per pool
+Only use the pool endpoints is selected regions. This may be useful a pools endpoints are only operational in some regions, e.g. https://bitcointalk.org/index.php?topic=472510.msg51637436#msg51637436.
+
+E.g. To use only the MiningPoolHub ming endpoints in regions 'Asia' and 'US':
+
+    "MiningPoolHub": {
+      "Region":  [
+        "Asia",
+        "US"
+      ]
+    }
+Note: The values for 'Regions' must match the definitions in 'Regions.txt'.
 
 NiceHash internal wallet
 
