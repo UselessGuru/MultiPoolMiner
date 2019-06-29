@@ -254,10 +254,6 @@ Listed in alphabetical order. Note: For basic operation not all parameters must 
       WebSite: https://ravenminer.com
       Payout in RVN (Ravencoin address must be provided using config.txt in Pools section use "Ravenminer" & RVN address)
 
-    ## YiiMP
-      WebSite: http://yiimp.eu/
-      Note: Yiimp is not an auto-exchange pool. Do NOT mine with a BTC address. A separate wallet address for each mined currency must be provided in config file (Advanced configuration via config file required, see below)
-
     ## Zpool / ZPoolCoins
       WebSite: http://www.zpool.ca/
       Payout in BTC (Bitcoin address must be provided using the '-Wallet' command), or any currency available in API (Advanced configuration via config file required, see below)
