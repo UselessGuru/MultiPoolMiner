@@ -55,6 +55,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Updated NVIDIA-XmrigCryptonight_v2.14.4
 
 #### Pool changes
+- Removed Yiimp pool; closed since June 22nd 2019 (https://twitter.com/tpruvot)
 - MiningPoolHubCoins: workaround for invalid MaxCoin host info in API (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-496887747)
 
 #### Changes in Algorithms.txt
