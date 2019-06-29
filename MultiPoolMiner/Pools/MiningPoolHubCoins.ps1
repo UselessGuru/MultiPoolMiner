@@ -55,7 +55,7 @@ if ($Config.Pools.$Name.User) {
 
         if ($PoolHosts.Count -gt 1) {$Regions = $PoolRegions} else {$Regions = $Config.Region} #Do not create multiple pool objects if there is only one host
 
-        $Regions | ForEach-Object {
+        $PoolRegions | ForEach-Object {
             $Region = $_
             $Region_Norm = Get-Region ($Region -replace "^us-east$", "us")
 
