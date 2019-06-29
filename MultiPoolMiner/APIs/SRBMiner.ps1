@@ -66,13 +66,18 @@ class SRBMiner : Miner {
         $Timeout = 5 #seconds
 
         $Request = "http://$($Server):$($this.Port)"
-        $Response = ""
+        $Data = ""
 
         try {
-            $Data = Invoke-RestMethod $Request -UseBasicParsing -TimeoutSec $Timeout -ErrorAction Stop
+            if ($Global:PSVersionTable.PSVersion -ge [System.Version]("6.0.0")) {
+                $Data = Invoke-RestMethod $Request -TimeoutSec $Timeout -DisableKeepAlive -MaximumRetryCount 3 -RetryIntervalSec 1 -ErrorAction Stop
+            }
+            else {
+                $Data = Invoke-RestMethod $Request -TimeoutSec $Timeout -DisableKeepAlive -ErrorAction Stop
+            }
         }
         catch {
-            return @($Request, $Response)
+            return @($Request, $Data)
         }
 
         $HashRate = [PSCustomObject]@{}
@@ -84,7 +89,7 @@ class SRBMiner : Miner {
             if ((-not $Shares_Accepted -and $Shares_Rejected -ge 3) -or ($Shares_Accepted -and ($Shares_Rejected * $this.AllowedBadShareRatio -gt $Shares_Accepted))) {
                 $this.SetStatus("Failed")
                 $this.StatusMessage = " was stopped because of too many bad shares for algorithm $($HashRate_Name) (total: $($Shares_Accepted + $Shares_Rejected) / bad: $($Shares_Rejected) [Configured allowed ratio is 1:$(1 / $this.AllowedBadShareRatio)])"
-                return @($Request, $Response)
+                return @($Request, $Data)
             }
         }
 
@@ -93,7 +98,7 @@ class SRBMiner : Miner {
         if ($HashRate.PSObject.Properties.Value -gt 0) {
             $this.Data += [PSCustomObject]@{
                 Date       = (Get-Date).ToUniversalTime()
-                Raw        = $Response
+                Raw        = $Data
                 HashRate   = $HashRate
                 PowerUsage = (Get-PowerUsage $this.DeviceName)
                 Device     = @()

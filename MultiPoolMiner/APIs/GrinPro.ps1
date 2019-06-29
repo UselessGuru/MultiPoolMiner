@@ -11,16 +11,11 @@ class GrinPro : Miner {
         $Response = ""
 
         try {
-            $WebClient = New-Object TimeoutWebClient
-            $WebClient.TimeoutSeconds = $TimeOut
-            $Response = $WebClient.DownloadString($Request)
-            $Data = $Response | ConvertFrom-Json -ErrorAction Stop
+            $Response = Invoke-TcpRequest $Server $this.Port $Request $Timeout -ErrorAction Stop
+            $Data = $Response -split ";" | ConvertFrom-StringData -ErrorAction Stop
         }
         catch {
             return @($Request, $Response)
-        }
-        finally {
-            $WebClient.Dispose()
         }
 
         $HashRate = [PSCustomObject]@{}
