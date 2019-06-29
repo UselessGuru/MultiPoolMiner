@@ -6,7 +6,7 @@ https://github.com/UselessGuru/MultiPoolMiner/archive/master.zip
 
 Please also report if all is working fine - only so I can know that we get rid of all the bugs.
 
-## Changelog Version 3.4.0
+## Changelog Version 3.4.1
 
 ### Breaking changes from 3.3.x
 **Parameter '-UseDeviceNameForStatsFileNaming' is no longer valid**
