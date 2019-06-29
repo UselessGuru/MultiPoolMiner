@@ -33,7 +33,7 @@ if ($Miner_Config.Commands) {$Commands = $Miner_Config.Commands}
 else {
     $Commands = [PSCustomObject[]]@(
         #Single algo mining
-        [PSCustomObject]@{MainAlgorithm = "beam";         SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 2; Vendor = @("AMD", "NVIDIA"); Params = ""} #Equihash1505, new in 11.3.0
+        [PSCustomObject]@{MainAlgorithm = "beam";         SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 2; Vendor = @("AMD", "NVIDIA"); Params = ""} #EquihashR15050, new in 11.3.0
         [PSCustomObject]@{MainAlgorithm = "cuckaroo29";   SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 8; Vendor = @("NVIDIA"); Params = " --fast"} #Cuckaroo29, new in 14.3.1
         [PSCustomObject]@{MainAlgorithm = "cuckatoo31";   SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 8; Vendor = @("NVIDIA"); Params = ""} #Cuckatoo31, new in 14.2.0, requires GTX 1080Ti or RTX 2080Ti
         [PSCustomObject]@{MainAlgorithm = "aeternity";    SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 2; Vendor = @("NVIDIA"); Params = " --fast"} #Aeternity, new in 11.1.0
