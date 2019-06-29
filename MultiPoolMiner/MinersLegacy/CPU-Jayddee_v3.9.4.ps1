@@ -26,13 +26,13 @@ else {
         "allium"        = "" #Garlicoin
         "hmq1725"       = "" #HMQ1725
         "hodl"          = "" # hodlcoin
+        "lyra2z330"     = "" #Lyra2z330
         "m7m"           = "" #m7m
         "x12"           = "" #x12
         "yespower"      = "" #Yespower
         "yespowerr16"   = "" #YespowerR16
         "yescrypt"      = "" #Yescrypt
         "yescryptr16"   = "" #YescryptR16
-        "lyra2z330"     = "" #Lyra2z330
 
 
         ### MAYBE PROFITABLE ALGORITHMS - NOT MINEABLE IN SUPPORTED POOLS AS OF 30/03/20198
@@ -53,7 +53,6 @@ else {
         "fresh"         = "" #fresh
         "heavy"         = "" #heavy
         "jha"           = "" #JHA
-        "lyra2z330"     = "" #lyra2z330
         "pentablake"    = "" #pentablake
         "pluck"         = "" #pluck
         "scryptjane:nf" = "" #scryptjane:nf
