@@ -2,9 +2,21 @@
 https://github.com/MultiPoolMiner/MultiPoolMiner
 
 Download link:
-https://github.com/MultiPoolMiner/MultiPoolMiner/archive/Version-3.4.0.zip
+https://github.com/MultiPoolMiner/MultiPoolMiner/archive/Version-3.4.1.zip
 
 Please also report if all is working fine - only so I can know that we get rid of all the bugs.
+
+## Changelog Version 3.4.1
+
+#### Core changes
+- Added parameter '-MinAccuracy'
+- Added pool config items 'Region' & 'ExcludeRegion'
+
+#### Changes in Algorithms.txt
+- Added EquihashR12540
+- Added "zelcash":  "EquihashR12540"
+- Changed "beam":  "EquihashR15050"
+- Renamed Equihash1550 to EquihashR1550
 
 ## Changelog Version 3.4.0
 
@@ -19,7 +31,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - API: updated to version 0.95; added '/alldevices', '/allminers' & '/intervals'
 - Fixed miners Claymore*, Gminer, lolMinerEquihash, Nanominer, SRBMinerCryptonight & Wildrig; device enumeration can now use mapping as configured by 'DevicePciOrderMapping' 
 - Improved config file validation
-- Parameters '-MinerName' and '-ExcludeMinerName' can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed'; MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.1' or MinerName, e.g. 'AMD-TeamRed_v0.5.1-1xEllesmere8GB'
+- Parameters '-MinerName' and '-ExcludeMinerName' can be in one of the 3 forms: MinerBaseName e.g. 'AMD-TeamRed'; MinerBaseName_Version, e.g. 'AMD-TeamRed_v0.5.2' or MinerName, e.g. 'AMD-TeamRed_v0.5.2-1xEllesmere8GB'
 - Removed code for '-UseDeviceNameForStatsFileNaming'
 - Renamed parameter '-NoDevFeeMiners' to '-DisableDevFeeMining' to better reflect its function
 - Rewrote interval & hashrate collector scheduler
@@ -27,8 +39,11 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Web dashboard: Added column 'Status' to devices overview (available status: 'Disabled', 'Idle', 'Running (MinerName)', 'Benchmarking (MinerName)' & 'Failed'
 
 #### Miner Changes
+- Added CcminerRfv2; support for RainforestV2
 - Fixed NVIDIA-CcminerZenemy_v2.00; invalid --devices0 parameter (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-495972633)
 - Fixed AMD_NVIDIA-BMiner_v15.5.3 SSL for secondary algorithm
+- Fixed NVIDIA-CcminerZenemy_v2.00; invalid --devices0 parameter (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-495972633)
+- Fixed NVIDIA-MiniZEquihash_v1.3n5; added '--pers auto' for Equihash 1927 algo
 - Renamed NVIDIA-CcminerZenemy_v2.00 to NVIDIA-CcminerZenemy_v20.0 (typo)
 - Removed CPU-Cryply_v3.8.8.4; (moved to 'Deprecated' folder); CPU-Jayddee_v3.9.3.1 is newer and has no dev fee
 - Updated AMD_CPU_NVIDIA-FireiceCryptonight_v2.10.5
@@ -38,7 +53,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Updated AMD-JCECryptonote_v0.33b18; changed API to XmRig
 - Updated AMD-SRBMinerCryptonight_v1.9.0
 - Updated AMD-TeamRed_v0.5.2
-- Updated AMD-WildRig_v0.17.8; support for Blake2b-BTCC, Blake2b-Glt & Skein2
+- Updated AMD-WildRig_v0.17.9; support for Blake2b-BTCC, Blake2b-Glt & Skein2
 - Updated AMD-XmrigCryptonight_v2.14.4
 - Updated CPU-Jayddee_v3.9.4; support for Lyra2rev3, Sha256q, Sonoa, Yespower, YespowerR16 & Yescryptr16
 - Updated CPU-JCECryptonote_v0.33q; changed API to XmRig
