@@ -19,6 +19,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Renamed Equihash1550 to EquihashR1550
 
 #### Pool changes
+- Fixed MiningPoolHubCoins; pool did not return any pool objects
 - Removed Yiimp pool; closed since June 22nd 2019 (https://twitter.com/tpruvot)
 
 ## Changelog Version 3.4.0
