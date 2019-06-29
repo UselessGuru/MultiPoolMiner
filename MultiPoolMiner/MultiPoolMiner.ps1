@@ -255,14 +255,16 @@ while (-not $API.Stop) {
     if (-not $Config.MinerStatusKey -and $Config.Wallets.BTC) {$Config | Add-Member MinerStatusKey $Config.Wallets.BTC -Force} #for backward compatibility
 
     #Config file may not contain an entry for all supported parameters, use value from command line, or if empty use default
-    $Config | Add-Member Pools ([PSCustomObject]@{}) -ErrorAction SilentlyContinue
     $Config | Add-Member Miners ([PSCustomObject]@{}) -ErrorAction SilentlyContinue
     $Config | Add-Member MinersLegacy ([PSCustomObject]@{}) -ErrorAction SilentlyContinue
+    $Config | Add-Member Pools ([PSCustomObject]@{}) -ErrorAction SilentlyContinue
+    $Config | Add-Member Wallets ([PSCustomObject]@{}) -ErrorAction SilentlyContinue
+
     #Add variables that do not have an entry in config file
-    $Config_Parameters.Keys | Where-Object {$Config_Parameters.$_} |ForEach-Object {
+    $Config_Parameters.Keys | Where-Object {$Config_Parameters.$_} | Where-Object {$_ -notmatch "Username|Wallet"} | ForEach-Object {
         $Config | Add-Member $_ "$($Config_Parameters.$_)" -ErrorAction SilentlyContinue
     }
-    if (-not $Config.Wallets.BTC -and $Wallet) {
+    if ($Wallet -and -not $Config.Wallets.BTC) {
         $Config.Wallets | Add-Member BTC $Wallet -Force
     }
 
@@ -529,8 +531,8 @@ while (-not $API.Stop) {
         Where-Object {$Config.Algorithm.Count -eq 0 -or (Compare-Object @($Config.Algorithm | Select-Object) @($_.Algorithm | Select-Object) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
         Where-Object {$Config.ExcludeAlgorithm.Count -eq 0 -or (Compare-Object @($Config.ExcludeAlgorithm | Select-Object) @($_.Algorithm | Select-Object | Select-Object -Unique) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} | 
         Where-Object {$Config.Pools.$($_.Name).ExcludeAlgorithm.Count -eq 0 -or (Compare-Object @($Config.Pools.$($_.Name).ExcludeAlgorithm | Select-Object) @($_.Algorithm | Select-Object) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} | 
-        Where-Object {$Config.Pools.$($_.Name).Regions.Count -eq 0 -or (Compare-Object @($Config.Pools.$($_.Name).Region | Select-Object) @($_.Region) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
-        Where-Object {$Config.Pools.$($_.Name).ExcludeRegions.Count -eq 0 -or (Compare-Object @($Config.Pools.$($_.Name).ExcludeRegion | Select-Object) @($_.Region) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} | 
+        Where-Object {$Config.Pools.$($_.Name).Region.Count -eq 0 -or (Compare-Object @($Config.Pools.$($_.Name).Region | Select-Object) @($_.Region) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
+        Where-Object {$Config.Pools.$($_.Name).ExcludeRegion.Count -eq 0 -or (Compare-Object @($Config.Pools.$($_.Name).ExcludeRegion | Select-Object) @($_.Region) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} | 
         Where-Object {$Config.CoinName.Count -eq 0 -or (Compare-Object @($Config.CoinName | Select-Object) @($_.CoinName | Select-Object) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
         Where-Object {$Config.Pools.$($_.Name).CoinName.Count -eq 0 -or (Compare-Object @($Config.Pools.$($_.Name).CoinName | Select-Object) @($_.CoinName | Select-Object) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -gt 0} | 
         Where-Object {$Config.ExcludeCoinName.Count -eq 0 -or (Compare-Object @($Config.ExcludeCoinName | Select-Object) @($_.CoinName | Select-Object) -IncludeEqual -ExcludeDifferent | Measure-Object).Count -eq 0} | 
