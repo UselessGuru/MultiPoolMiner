@@ -34,7 +34,7 @@ else {
     $Commands = [PSCustomObject[]]@(
         [PSCustomObject]@{Algorithm = "Equihash144,5"; MinMemGB = 2.0; Params = ""}
         [PSCustomObject]@{Algorithm = "Equihash150,5"; MinMemGB = 2.0; Params = ""}
-        [PSCustomObject]@{Algorithm = "Equihash192,7"; MinMemGB = 2.0; Params = ""}
+        [PSCustomObject]@{Algorithm = "Equihash192,7"; MinMemGB = 3.0; Params = ""}
         [PSCustomObject]@{Algorithm = "Equihash96,5";  MinMemGB = 2.0; Params = ""}
     )
 }
