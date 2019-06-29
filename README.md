@@ -8,11 +8,24 @@ Please also report if all is working fine - only so I can know that we get rid o
 
 ## Changelog Version 3.4.1
 
+#### Core changes
+- Added parameter '-MinAccuracy'
+- Added pool config items 'Region' & 'ExcludeRegion'
+
+#### Changes in Algorithms.txt
+- Added EquihashR12540
+- Added "zelcash":  "EquihashR12540"
+- Changed "beam":  "EquihashR15050"
+- Renamed Equihash1550 to EquihashR1550
+
+#### Pool changes
+- Removed Yiimp pool; closed since June 22nd 2019 (https://twitter.com/tpruvot)
+
+## Changelog Version 3.4.0
+
 ### Breaking changes from 3.3.x
 **Parameter '-UseDeviceNameForStatsFileNaming' is no longer valid**
-
-**'-UseDeviceNameForStatsFileNaming:true' is enforced**
-
+**'-UseDeviceNameForStatsFileNaming:true will be enforced**
 This will trigger all benchmarks to be re-executed (unless you were running MPM with '-UseDeviceNameForStatsFileNaming:true' already)
 
 #### Core changes
@@ -29,6 +42,8 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Web dashboard: Added column 'Status' to devices overview (available status: 'Disabled', 'Idle', 'Running (MinerName)', 'Benchmarking (MinerName)' & 'Failed'
 
 #### Miner Changes
+- Added CcminerRfv2; support for RainforestV2
+- Fixed NVIDIA-CcminerZenemy_v2.00; invalid --devices0 parameter (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-495972633)
 - Fixed AMD_NVIDIA-BMiner_v15.5.3 SSL for secondary algorithm
 - Fixed NVIDIA-CcminerZenemy_v2.00; invalid --devices0 parameter (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-495972633)
 - Fixed NVIDIA-MiniZEquihash_v1.3n5; added '--pers auto' for Equihash 1927 algo
@@ -37,32 +52,25 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Updated AMD_CPU_NVIDIA-FireiceCryptonight_v2.10.5
 - Updated AMD_NVIDIA-ClaymoreEthash_v14.7
 - Updated AMD_NVIDIA-GminerEquihash_v1.47; support for Equihash 1255
-- Updated AMD_NVIDIA-lolMinerEquihash_v0.82
 - Updated AMD_NVIDIA-NanoMiner_v1.3.4
 - Updated AMD-JCECryptonote_v0.33b18; changed API to XmRig
 - Updated AMD-SRBMinerCryptonight_v1.9.0
 - Updated AMD-TeamRed_v0.5.2
 - Updated AMD-WildRig_v0.17.9; support for Blake2b-BTCC, Blake2b-Glt & Skein2
 - Updated AMD-XmrigCryptonight_v2.14.4
-- Updated CPU-Jayddee_v3.9.4; support for Lyra2rev3, Sha256q, Sonoa, Yespower, YespowerR16 & Yescryptr16
+- Updated CPU-Jayddee_v3.9.4; support for Lyra2z330, Sha256q, Sonoa, Yespower, YespowerR16 & Yescryptr16
 - Updated CPU-JCECryptonote_v0.33q; changed API to XmRig
 - Updated CPU-XmrigCryptonight_v2.14.4
 - Updated NVIDIA-CcminerMTP_v1.1.20
 - Updated NVIDIA-CcminerTrex_v0.12.0; support for Honeycomb
+- Updated NVIDIA-CcminerKlausT_v8.21modR18.ps1; added support for Lyra2z330
 - Updated NVIDIA-CryptoDredge_v0.20.1
 - Updated NVIDIA-NBMiner_v23.3; fixed min. memory requirements (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2343#issuecomment-503419922)
 - Updated NVIDIA-TTMiner_v2.2.5
 - Updated NVIDIA-XmrigCryptonight_v2.14.4
 
 #### Pool changes
-- Removed Yiimp pool; closed since June 22nd 2019 (https://twitter.com/tpruvot)
 - MiningPoolHubCoins: workaround for invalid MaxCoin host info in API (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-496887747)
-
-#### Changes in Algorithms.txt
-- Added EquihashR12540
-- Added "zelcash":  "EquihashR12540"
-- Changed "beam":  "EquihashR15050"
-- Renamed Equihash1550 to EquihashR1550
 
 ## Changelog Version 3.3.0
 
