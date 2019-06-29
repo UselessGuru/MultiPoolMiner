@@ -37,6 +37,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Updated AMD_CPU_NVIDIA-FireiceCryptonight_v2.10.5
 - Updated AMD_NVIDIA-ClaymoreEthash_v14.7
 - Updated AMD_NVIDIA-GminerEquihash_v1.47; support for Equihash 1255
+- Updated AMD_NVIDIA-lolMinerEquihash_v0.82
 - Updated AMD_NVIDIA-NanoMiner_v1.3.4
 - Updated AMD-JCECryptonote_v0.33b18; changed API to XmRig
 - Updated AMD-SRBMinerCryptonight_v1.9.0
@@ -55,6 +56,12 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 
 #### Pool changes
 - MiningPoolHubCoins: workaround for invalid MaxCoin host info in API (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-496887747)
+
+#### Changes in Algorithms.txt
+- Added EquihashR12540
+- Added "zelcash":  "EquihashR12540"
+- Changed "beam":  "EquihashR15050"
+- Renamed Equihash1550 to EquihashR1550
 
 ## Changelog Version 3.3.0
 
