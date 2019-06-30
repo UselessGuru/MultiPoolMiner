@@ -6,6 +6,11 @@ https://github.com/UselessGuru/MultiPoolMiner/archive/master.zip
 
 Please also report if all is working fine - only so I can know that we get rid of all the bugs.
 
+## Changelog Version 3.4.2
+
+#### Miner changes
+- Updated NVIDIA-CcminerTrex_v0.12.1
+
 ## Changelog Version 3.4.1
 
 #### Core changes
