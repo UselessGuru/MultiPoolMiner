@@ -30,7 +30,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Added EquihashR12540
 - Added "zelcash":  "EquihashR12540"
 - Changed "beam":  "EquihashR15050"
-- Renamed Equihash1550 to EquihashR1550
+- Renamed Equihash1550 to EquihashR15050
 
 ## Changelog Version 3.4.0
 
