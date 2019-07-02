@@ -6,6 +6,17 @@ https://github.com/UselessGuru/MultiPoolMiner/archive/master.zip
 
 Please also report if all is working fine - only so I can know that we get rid of all the bugs.
 
+## Changelog Version 3.4.4
+
+#### Core changes
+- Enabled default WarmupTime for all miners
+- Fixed dashboard banner information when benchmarking
+
+#### Miner Changes
+- Updated AMD_NVIDIA-NanoMiner_v1.4.1
+- Updated CPU-Jayddee_v3.9.5.1; fixes Skein2 crash
+- Updated NVIDIA-MiniZEquihash_v1.4o; support for EquihashR12540
+
 ## Changelog Version 3.4.3
 
 #### Core Changes
@@ -13,7 +24,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Fixed miner APIs to be compatible with PWSH 6.2.0
 - Fixed miner APIs; fixed crashing miners when miner windows are hidden (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2345#issuecomment-506898390)
 
-#### Miner Updates
+#### Miner Changes
 - Fixed AMD_CPU_NVIDIA-FireiceCryptonight_v2.10.5; PlatformThreadsConfigFile naming was invalid
 - Fixed AMD_NVIDIA-GminerEquihash_v1.47; EquihashR12540 is supported on AMD only
 - Updated CPU-Jayddee_v3.9.5; disabled Skein2, seems to be broken (https://github.com/JayDDee/cpuminer-opt/issues/194)
@@ -42,7 +53,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Added EquihashR12540
 - Added "zelcash":  "EquihashR12540"
 - Changed "beam":  "EquihashR15050"
-- Renamed Equihash1550 to EquihashR15050
+- Renamed Equihash1550 to EquihashR1550
 
 ## Changelog Version 3.4.0
 
@@ -71,7 +82,7 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Fixed NVIDIA-CcminerZenemy_v2.00; invalid --devices0 parameter (https://github.com/MultiPoolMiner/MultiPoolMiner/issues/2339#issuecomment-495972633)
 - Fixed NVIDIA-MiniZEquihash_v1.3n5; added '--pers auto' for Equihash 1927 algo
 - Renamed NVIDIA-CcminerZenemy_v2.00 to NVIDIA-CcminerZenemy_v20.0 (typo)
-- Removed CPU-Cryply_v3.8.8.4; (moved to 'Deprecated' folder); CPU-Jayddee_v3.9.4 is newer and has no dev fee
+- Removed CPU-Cryply_v3.8.8.4; (moved to 'Deprecated' folder); CPU-Jayddee_v3.9.3.1 is newer and has no dev fee
 - Updated AMD_CPU_NVIDIA-FireiceCryptonight_v2.10.5
 - Updated AMD_NVIDIA-ClaymoreEthash_v14.7
 - Updated AMD_NVIDIA-GminerEquihash_v1.47; support for Equihash 1255
@@ -79,9 +90,9 @@ This will trigger all benchmarks to be re-executed (unless you were running MPM 
 - Updated AMD-JCECryptonote_v0.33b18; changed API to XmRig
 - Updated AMD-SRBMinerCryptonight_v1.9.0
 - Updated AMD-TeamRed_v0.5.2
-- Updated AMD-WildRig_v0.17.8; support for Blake2b-BTCC, Blake2b-Glt & Skein2
+- Updated AMD-WildRig_v0.17.9; support for Blake2b-BTCC, Blake2b-Glt & Skein2
 - Updated AMD-XmrigCryptonight_v2.14.4
-- Updated CPU-Jayddee_v3.9.4; support for Sha256q, Sonoa, Yespower, YespowerR16 & Yescryptr16
+- Updated CPU-Jayddee_v3.9.4; support for Lyra2rev3, Sha256q, Sonoa, Yespower, YespowerR16 & Yescryptr16
 - Updated CPU-JCECryptonote_v0.33q; changed API to XmRig
 - Updated CPU-XmrigCryptonight_v2.14.4
 - Updated NVIDIA-CcminerMTP_v1.1.20
