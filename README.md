@@ -2,7 +2,7 @@
 https://github.com/MultiPoolMiner/MultiPoolMiner
 
 Download link:
-https://github.com/UselessGuru/MultiPoolMiner/archive/master.zip
+https://github.com/MultiPoolMiner/MultiPoolMiner/archive/Version-3.4.4.zip
 
 Please also report if all is working fine - only so I can know that we get rid of all the bugs.
 
@@ -13,6 +13,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Fixed dashboard banner information when benchmarking
 
 #### Miner Changes
+- Updated NVIDIA-NBMiner_v23.3; device enumeration was broken
 - Updated AMD_NVIDIA-NanoMiner_v1.4.1
 - Updated CPU-Jayddee_v3.9.5.1; fixes Skein2 crash
 - Updated NVIDIA-MiniZEquihash_v1.4o; support for EquihashR12540
