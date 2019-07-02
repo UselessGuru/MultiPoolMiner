@@ -9,9 +9,9 @@ param(
 
 $Name = "$(Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName)"
 $Path = ".\Bin\$($Name)\BMiner.exe"
-$HashSHA256 = "13A9CB591C7A9FAF4D51273B8B448B6F27F7D1D86237039AD356452F3A7B737C"
-$Uri = "https://www.bminercontent.com/releases/bminer-lite-v15.5.3-747d98e-amd64.zip"
-$ManualUri = "https://bitcointalk.org/index.php?topic=2519271.0"
+$HashSHA256 = ""
+$Uri = ""
+$ManualUri = "https://bitcointalk.org/index.php?topic=2519271.msg51539067#msg51539067"
 
 $Miner_Version = Get-MinerVersion $Name
 $Miner_BaseName = Get-MinerBaseName $Name
@@ -61,6 +61,7 @@ else {
         [PSCustomObject]@{MainAlgorithm = "ethash3gb";    SecondaryAlgorithm = "vbk";       ; SecondaryIntensity = 0;  MinMemGB = 3; Vendor = @("NVIDIA"); Params = ""} #Ethash3Gb & Bytom dual mining, auto dual solver and intensity
         [PSCustomObject]@{MainAlgorithm = "ethash";       SecondaryAlgorithm = "vbk";       ; SecondaryIntensity = 0;  MinMemGB = 4; Vendor = @("NVIDIA"); Params = ""} #Ethash & Bytom dual mining, auto dual solver and intensity
         [PSCustomObject]@{MainAlgorithm = "tensority";    SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 2; Vendor = @("NVIDIA"); Params = ""} #Bytom
+        [PSCustomObject]@{MainAlgorithm = "vds";          SecondaryAlgorithm = "";          ; SecondaryIntensity = 0;  MinMemGB = 2; Vendor = @("NVIDIA"); Params = ""} #VDS
     )
 }
 
