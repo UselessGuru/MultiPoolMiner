@@ -634,7 +634,7 @@ function Get-ChildItemContent {
         [Switch]$Threaded = $false
     )
 
-    $Job = Start-Job -InitializationScript ([scriptblock]::Create("Set-Location('$(Get-Location)')")) -Name $Parameters.JobName -ScriptBlock {
+    $Job = Start-ThreadJob -InitializationScript ([scriptblock]::Create("Set-Location('$(Get-Location)')")) -Name $Parameters.JobName -ScriptBlock {
         param(
             [Parameter(Mandatory = $true)]
             [String]$Path, 
