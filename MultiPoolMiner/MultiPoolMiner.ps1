@@ -1086,31 +1086,6 @@ while (-not $API.Stop) {
     }
 ###     Clear-Host
 
-    #Update CurrentEarning and CurrentProfit in API
-    if ($API) {
-        if ($RunningMiners -and $Rates.BTC.$FirstCurrency) {
-            if ($MinersNeedingBenchmark.Count -eq 0 -and $MinersNeedingPowerUsageMeasurement.count -eq 0) {
-                if ($MiningEarning) {
-                    $API.CurrentEarning = "Current Earning: $(($Rates.BTC | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | ForEach-Object {"$_ $(((($RunningMiners | Measure-Object -Sum -Property Earning).Sum) * $Rates.BTC.$_).ToString("N$((($Rates.BTC.$FirstCurrency).ToString().split('.') | Select-Object -Index 0).Length)"))"}) -join ' = ')"
-                }
-                if ($PowerPrice) {
-                    if ($Config.ShowPowerCost) {
-                        $API.MiningCost = "Current Power Cost: MiningCost"
-                    }
-                    if ($MiningProfit) {
-                        $API.CurrentProfit = "Current Profit: $(($Rates.BTC | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | ForEach-Object {"$_ $(((($RunningMiners | Measure-Object -Sum -Property Profit).Sum) * $Rates.BTC.$_).ToString("N$((($Rates.BTC.$FirstCurrency).ToString().split('.') | Select-Object -Index 0).Length)"))"}) -join ' = ')"
-                    }
-                }
-                else {$API.CurrentProfit = "N/A"}
-                $API.MiningCost = "/NA"
-            }
-            else {
-                {$API.CurrentEarning = "N/A (Benchmarking)"; $API.CurrentProfit = "N/A (Benchmarking)"}
-            }
-        }
-        else {$API.CurrentEarning = ""; $API.CurrentProfit = ""}
-    }
-
     #Display mining information
     [System.Collections.ArrayList]$Miner_Table = @(
         @{Width = [Int]($Miners.Name | Measure-Object Length -Maximum).maximum; Label = "Miner[Fee]"; Expression = {"$($_.Name)$(($_.Fees.PSObject.Properties.Value | ForEach-Object {"[{0:P2}]" -f [Double]$_}) -join '')"}}, 
@@ -1207,7 +1182,31 @@ while (-not $API.Stop) {
     #Display exchange rates
     $ExchangeRates = "Exchange Rates: $(($Config.Currency | Where-Object {$Rates.$Currency.$_} | ForEach-Object {"$($Rates.$Currency.$_) $($_)"}) -join " = ")"
     Write-Host $ExchangeRates
-    if ($API) {$API.ExchangeRates = $ExchangeRates}
+    if ($API) {
+        #Update ExchangeRates, CurrentEarning and CurrentProfit in API
+        $API.ExchangeRates = $ExchangeRates
+        if ($RunningMiners -and $Rates.BTC.$FirstCurrency) {
+            if ($MinersNeedingBenchmark -or $MinersNeedingPowerUsageMeasurement) {
+                $API.CurrentEarning = "Current Earning: N/A (Benchmarking)"; $API.CurrentProfit = "Current Profit: N/A (Benchmarking)"
+            }
+            else {
+                $API.MiningCost = "/NA"
+                if ($MiningEarning) {
+                    $API.CurrentEarning = "Current Earning: $(($Rates.BTC | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | ForEach-Object {"$_ $(((($RunningMiners | Measure-Object -Sum -Property Earning).Sum) * $Rates.BTC.$_).ToString("N$((($Rates.BTC.$FirstCurrency).ToString().split('.') | Select-Object -Index 0).Length)"))"}) -join ' = ')"
+                }
+                if ($PowerPrice) {
+                    if ($Config.ShowPowerCost) {
+                        $API.MiningCost = "Current Power Cost: MiningCost"
+                    }
+                    if ($MiningProfit) {
+                        $API.CurrentProfit = "Current Profit: $(($Rates.BTC | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | ForEach-Object {"$_ $(((($RunningMiners | Measure-Object -Sum -Property Profit).Sum) * $Rates.BTC.$_).ToString("N$((($Rates.BTC.$FirstCurrency).ToString().split('.') | Select-Object -Index 0).Length)"))"}) -join ' = ')"
+                    }
+                }
+                else {$API.CurrentProfit = "N/A"}
+            }
+        }
+        else {$API.CurrentEarning = ""; $API.CurrentProfit = ""}
+    }
 
     if ($MiningEarning -lt $MiningCost) {
         #Mining causes a loss
