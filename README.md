@@ -17,7 +17,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Fixed NVIDIA-Ewbf2Equihash_v0.6; device selection was broken
 - Fixed NVIDIA-NBMiner_v23.3; device enumeration was broken
 - Fixed NVIDIA-Zjazz_v1.2; device selection was broken
-- Updated AMD_NVIDIA-GminerEquihash_v1.48
+- Updated AMD_NVIDIA-GminerEquihash_v1.50
 - Updated AMD_NVIDIA-NanoMiner_v1.4.1
 - Updated AMD-TeamRed_v0.5.3; support for MTP algorithm
 - Updated CPU-Jayddee_v3.9.5.2; fixes Skein2 crash
