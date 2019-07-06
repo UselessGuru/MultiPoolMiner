@@ -25,6 +25,14 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Updated NVIDIA-CryptoDredge_v0.20.2
 - Updated NVIDIA-MiniZEquihash_v1.4o; support for EquihashR12540
 
+#### Pool files
+- use common code base
+- PhiPhiPool no longer offers auto-conversion to BTC
+
+#### Pool Balances files
+- use common code base
+- PhiPhiPool no longer offers auto-conversion to BTC
+
 ## Changelog Version 3.4.3
 
 #### Core Changes
