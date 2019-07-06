@@ -32,7 +32,7 @@ while (-not ($APIStatusRequest -and $APICurrenciesRequest) -and $RetryCount -gt 
     }
 }
 
-if (-not $APIStatusRequest) {
+if (-not ($APIStatusRequest -and $APICurrenciesRequest)) {
     Write-Log -Level Warn "Pool API ($Name) has failed. "
     return
 }
