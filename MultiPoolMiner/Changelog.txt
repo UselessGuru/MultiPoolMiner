@@ -11,6 +11,8 @@ Please also report if all is working fine - only so I can know that we get rid o
 #### Core changes
 - Enabled default WarmupTime for all miners
 - Fixed dashboard banner information when benchmarking
+- Pool balances: re-request pool balances when outdated
+- Web dashboard: Add 'Last update' to balances
 
 #### Miner Changes
 - Fixed NVIDIA-CcminerRfv2_v1.0.2; device selection was broken
