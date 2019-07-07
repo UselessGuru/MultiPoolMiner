@@ -6,11 +6,19 @@ param(
 
 $Name = Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty BaseName
 
+if (-not $Wallets) {
+    Write-Log -Level Verbose "Cannot get balance on pool ($Name) - no wallet address specified. "
+    return
+}
+
+# Guaranteed payout currencies
+$Payout_Currencies = @("BTC", "LTC")
+
 $RetryCount = 3
 $RetryDelay = 2
 while (-not ($APIRequest) -and $RetryCount -gt 0) {
     try {
-        if (-not $APIRequest) {$APIRequest = Invoke-RestMethod "http://www.nlpool.nl/api/currencies" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop}
+        $APIRequest = Invoke-RestMethod "http://www.nlpool.nl/api/currencies" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
     }
     catch {
         Start-Sleep -Seconds $RetryDelay # Pool might not like immediate requests
@@ -28,10 +36,7 @@ if (($APIRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Mea
     return
 }
 
-# Guaranteed payout currencies
-$Payout_Currencies = @("BTC", "LTC")
-$Payout_Currencies = $Payout_Currencies + @($APIRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name) | Select-Object -Unique | Sort-Object | Where-Object {$Wallets.$_}
-
+$Payout_Currencies = ($Payout_Currencies + @($APIRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name)) | Where-Object {$Wallets.$_} | Sort-Object -Unique
 if (-not $Payout_Currencies) {
     Write-Log -Level Verbose "Cannot get balance on pool ($Name) - no wallet address specified. "
     return

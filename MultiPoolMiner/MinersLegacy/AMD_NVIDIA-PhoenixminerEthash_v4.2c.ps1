@@ -23,7 +23,7 @@ $CUDAVersion = ($Devices | Where-Object Type -EQ "GPU" | Where-Object Vendor -EQ
 $AMDVersion  = ($Devices | Where-Object Type -EQ "GPU" | Where-Object Vendor -EQ "Advanced Micro Devices, Inc." | Select-Object -Unique).OpenCL.DriverVersion
 
 if ($UnsupportedDriverVersions -contains $AMDVersion) {
-    Write-Log -Level Warn "Miner ($($Name)) does not support the installed AMD driver version $($AMDVersion). Please update your AMD drivers. "
+    Write-Log -Level Warn "Miner ($($Name)) does not support the installed AMD driver version $($AMDVersion). Please use a different AMD driver version. "
 }
 
 #Commands from config file take precedence
@@ -73,55 +73,54 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
     }
 
     $Commands | ForEach-Object {$Main_Algorithm_Norm = Get-Algorithm $_.MainAlgorithm; $_} | Where-Object {$Pools.$Main_Algorithm_Norm.Host} | ForEach-Object {
+        $Arguments_Primary = ""
+        $Arguments_Secondary = ""
         $Main_Algorithm = $_.MainAlgorithm
         $MinMemGB = $_.MinMemGB
         $Parameters = $_.Parameters
+        $Secondary_Algorithm = $_.SecondaryAlgorithm
+        $Secondary_Algorithm_Norm = Get-Algorithm $Secondary_Algorithm
         $TurboKernel = ""
-        $Arguments_Primary = ""
-        $Arguments_Secondary = ""
         
-        #define -coin parameter for bci or ubq
-        switch ($Main_Algorithm_Norm) {
-            "ProgPOW" {$Arguments_Primary = " -coin bci"}
-            "Ubqhash" {$Arguments_Primary = " -coin ubq"}
-        }
-        switch ($Pools.$Main_Algorithm_Norm.CoinName) {#Ethash coin to use for devfee to avoid switching DAGs
-            "Akroma"          {$Coin = " -coin akroma"}
-            "Atheios"         {$Coin = " -coin ath"} 
-            "Aura"            {$Coin = " -coin aura"}
-            "Bitcoin2Gen"     {$Coin = " -coin b2g"}
-            "BitcoinInterest" {$Coin = " -coin bci"}
-            "Callisto"        {$Coin = " -coin clo"}
-            "DubaiCoin"       {$Coin = " -coin dbix"}
-            "Ellaism"         {$Coin = " -coin ella"}
-            "Ether1"          {$Coin = " -coin etho"} 
-            "EtherCC"         {$Coin = " -coin etcc"} 
-            "EtherGem"        {$Coin = " -coin egem"}
-            "Ethersocial"     {$Coin = " -coin esn"}
-            "EtherZero"       {$Coin = " -coin etz"}
-            "Ethereum"        {$Coin = " -coin eth"}
-            "EthereumClassic" {$Coin = " -coin etc"}
-            "Expanse"         {$Coin = " -coin exp"}
-            "Genom"           {$Coin = " -coin gen"}
-            "HotelbyteCoin"   {$Coin = " -coin hbc"}
-            "Metaverse"       {$Coin = " -coin etp"}
-            "Mix"             {$Coin = " -coin mix"} 
-            "Moac"            {$Coin = " -coin moac"}
-            "Musicoin"        {$Coin = " -coin music"}
-            "Nekonium"        {$Coin = " -coin nuko"}
-            "Pegascoin"       {$Coin = " -coin pgc"}
-            "Pirl"            {$Coin = " -coin pirl"} 
-            "Reosc"           {$Coin = " -coin reosc"} 
-            "Ubiq"            {$Coin = " -coin ubq"}
-            "Victorium"       {$Coin = " -coin vic"}
-            "WhaleCoin"       {$Coin = " -coin whale"}
-            "Yocoin"          {$Coin = " -coin yoc"}
-            default           {$Coin = " -coin auto"}
-        }
-
         if ($Miner_Device = @($Device | Where-Object {([math]::Round((10 * $_.OpenCL.GlobalMemSize / 1GB), 0) / 10) -ge $MinMemGB})) {
-            $Secondary_Algorithm = $_.SecondaryAlgorithm
-            $Secondary_Algorithm_Norm = Get-Algorithm $Secondary_Algorithm
+            #define -coin parameter for bci or ubq
+            switch ($Main_Algorithm_Norm) {
+                "ProgPOW" {$Arguments_Primary = " -coin bci"}
+                "Ubqhash" {$Arguments_Primary = " -coin ubq"}
+            }
+            switch ($Pools.$Main_Algorithm_Norm.CoinName) {#Ethash coin to use for devfee to avoid switching DAGs
+                "Akroma"          {$Coin = " -coin akroma"}
+                "Atheios"         {$Coin = " -coin ath"} 
+                "Aura"            {$Coin = " -coin aura"}
+                "Bitcoin2Gen"     {$Coin = " -coin b2g"}
+                "BitcoinInterest" {$Coin = " -coin bci"}
+                "Callisto"        {$Coin = " -coin clo"}
+                "DubaiCoin"       {$Coin = " -coin dbix"}
+                "Ellaism"         {$Coin = " -coin ella"}
+                "Ether1"          {$Coin = " -coin etho"} 
+                "EtherCC"         {$Coin = " -coin etcc"} 
+                "EtherGem"        {$Coin = " -coin egem"}
+                "Ethersocial"     {$Coin = " -coin esn"}
+                "EtherZero"       {$Coin = " -coin etz"}
+                "Ethereum"        {$Coin = " -coin eth"}
+                "EthereumClassic" {$Coin = " -coin etc"}
+                "Expanse"         {$Coin = " -coin exp"}
+                "Genom"           {$Coin = " -coin gen"}
+                "HotelbyteCoin"   {$Coin = " -coin hbc"}
+                "Metaverse"       {$Coin = " -coin etp"}
+                "Mix"             {$Coin = " -coin mix"} 
+                "Moac"            {$Coin = " -coin moac"}
+                "Musicoin"        {$Coin = " -coin music"}
+                "Nekonium"        {$Coin = " -coin nuko"}
+                "Pegascoin"       {$Coin = " -coin pgc"}
+                "Pirl"            {$Coin = " -coin pirl"} 
+                "Reosc"           {$Coin = " -coin reosc"} 
+                "Ubiq"            {$Coin = " -coin ubq"}
+                "Victorium"       {$Coin = " -coin vic"}
+                "WhaleCoin"       {$Coin = " -coin whale"}
+                "Yocoin"          {$Coin = " -coin yoc"}
+                default           {$Coin = " -coin auto"}
+            }
 
             #Get parameters for active miner devices
             if ($Miner_Config.Parameters.$Algorithm_Norm) {
@@ -136,15 +135,15 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
 
             if ($Secondary_Algorithm_Norm) {
                 $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') + @("$Main_Algorithm_Norm$($Secondary_Algorithm_Norm -replace 'Nicehash'<#temp fix#>)") + @("$(if ($_.SecondaryIntensity -ge 0) {$_.SecondaryIntensity})") | Select-Object) -join '-'
-                $Miner_HashRates = [PSCustomObject]@{"$Main_Algorithm_Norm" = $Stats."$($Miner_Name)_$($Main_Algorithm_Norm)_HashRate".Week; "$Secondary_Algorithm_Norm" = $Stats."$($Miner_Name)_$($Secondary_Algorithm_Norm)_HashRate".Week}
+                $Miner_HashRates = [PSCustomObject]@{$Main_Algorithm_Norm = $Stats."$($Miner_Name)_$($Main_Algorithm_Norm)_HashRate".Week; $Secondary_Algorithm_Norm = $Stats."$($Miner_Name)_$($Secondary_Algorithm_Norm)_HashRate".Week}
                 $Arguments_Secondary += " -dcoin $Secondary_Algorithm -dpool $(if ($Pools.$Secondary_Algorithm_Norm.SSL) {"ssl://"})$($Pools.$Secondary_Algorithm_Norm.Host):$($Pools.$Secondary_Algorithm_Norm.Port) -dwal $($Pools.$Secondary_Algorithm_Norm.User) -dpass $($Pools.$Secondary_Algorithm_Norm.Pass)$(if($_.SecondaryIntensity -ge 0){" -sci $($_.SecondaryIntensity)"})"
                 $IntervalMultiplier = 2
                 $WarmupTime = 45
-                $Miner_Fees = [PSCustomObject]@{"$Main_Algorithm_Norm" = 0.9 / 100; "$Secondary_Algorithm_Norm" = 0 / 100}
+                $Miner_Fees = [PSCustomObject]@{$Main_Algorithm_Norm = 0.9 / 100; $Secondary_Algorithm_Norm = 0 / 100}
             }
             else {
                 $Miner_Name = (@($Name) + @(($Miner_Device.Model_Norm | Sort-Object -unique | ForEach-Object {$Model_Norm = $_; "$(@($Miner_Device | Where-Object Model_Norm -eq $Model_Norm).Count)x$Model_Norm"}) -join '_') | Select-Object) -join '-'
-                $Miner_HashRates = [PSCustomObject]@{"$Main_Algorithm_Norm" = $Stats."$($Miner_Name)_$($Main_Algorithm_Norm)_HashRate".Week}
+                $Miner_HashRates = [PSCustomObject]@{$Main_Algorithm_Norm = $Stats."$($Miner_Name)_$($Main_Algorithm_Norm)_HashRate".Week}
                 $Arguments_Primary += " -gt 0" #Enable auto-tuning
                 
                 if ($CommonParameters -match " -gt 0" ) {$IntervalMultiplier = 2} else {$IntervalMultiplier = 1}
@@ -172,7 +171,7 @@ $Devices | Select-Object Vendor, Model -Unique | ForEach-Object {
                 URI                = $Uri
                 Fees               = $Miner_Fees
                 IntervalMultiplier = $IntervalMultiplier
-                WarmupTime         = $WarmupTime
+                WarmupTime         = $WarmupTime #seconds
             }
         }
     }
