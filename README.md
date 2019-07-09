@@ -20,6 +20,9 @@ Please also report if all is working fine - only so I can know that we get rid o
 - Updated AMD_NVIDIA-lolMiner_v0.84; removed 'Equihash' from its name 'cause it does non Equihash algos as well
 - Updated AMD-WildRig_v0.18.0; suppport for GltGlobalHash
 
+#### Pool changes
+- Fixed BlockMasters; did not return any objects
+
 ## Changelog Version 3.4.4
 
 #### Core changes
