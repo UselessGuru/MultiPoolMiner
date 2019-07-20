@@ -1,5 +1,11 @@
-# This is the home of the MultiPoolMiner dev versions
+MultiPoolMiner dev versions
 https://github.com/MultiPoolMiner/MultiPoolMiner
+
+## Update 20.07.2019
+I do no longer have the permission to commit pull requests on the original repository @ https://github.com/MultiPoolMiner/MultiPoolMiner.
+For this reason I will exclusively maintain the code base in my own repository (https://github.com/UselessGuru/MultiPoolMiner) until further notice.
+
+**Please report issues regarding new MPM versions exclusively in my own repository.**
 
 Download link:
 https://github.com/MultiPoolMiner/MultiPoolMiner/archive/Version-3.4.5.zip
