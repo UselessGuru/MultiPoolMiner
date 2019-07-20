@@ -227,8 +227,8 @@ $Config = [PSCustomObject]@{}
 
 #Set donation parameters
 $LastDonated = $Timer.AddDays(-1).AddHours(1)
-$WalletDonate = ((@("1Q24z7gHPDbedkaWDTFqhMF8g7iHMehsCb") * 3) + (@("16Qf1mEk5x2WjJ1HhfnvPnqQEi2fvCeity") * 2) + (@("1GPSq8txFnyrYdXL8t6S94mYdF8cGqVQJF") * 2))[(Get-Random -Minimum 0 -Maximum ((3 + 2 + 2) - 1))]
-$UserNameDonate = ((@("aaronsace") * 3) + (@("grantemsley") * 2) + (@("uselessguru") * 2))[(Get-Random -Minimum 0 -Maximum ((3 + 2 + 2) - 1))]
+$WalletDonate = ((@("1Q24z7gHPDbedkaWDTFqhMF8g7iHMehsCb") * 1) + (@("16Qf1mEk5x2WjJ1HhfnvPnqQEi2fvCeity") * 1) + (@("1GPSq8txFnyrYdXL8t6S94mYdF8cGqVQJF") * 8))[(Get-Random -Minimum 0 -Maximum ((1 + 1 + 8) - 1))]
+$UserNameDonate = ((@("aaronsace") * 1) + (@("grantemsley") * 1) + (@("uselessguru") * 8))[(Get-Random -Minimum 0 -Maximum ((1 + 1 + 8) - 1))]
 $WorkerNameDonate = "multipoolminer_donate_$($Version -replace '[\W]')"
 
 #Set process priority to BelowNormal to avoid hash rate drops on systems with weak CPUs
@@ -482,6 +482,8 @@ if ($Config.Debug) {Write-Log -Level Debug "Request Pools data"}
             if ($API) {$API.NewPools_Jobs = $NewPools_Jobs} #Give API access to pool jobs information
         }
     }
+
+if ($Config.Debug) {Write-Log -Level Debug "Power cost"}
 
     #Power cost preparations
     $PowerPrice = [Double]0
