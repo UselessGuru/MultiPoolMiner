@@ -9,6 +9,10 @@ $Name = Get-Item $MyInvocation.MyCommand.Path | Select-Object -ExpandProperty Ba
 
 # Guaranteed payout currencies
 $Payout_Currencies = @("RVN") | Where-Object {$Config.Pools.$Name.Wallets.$_}
+if (-not $Payout_Currencies) {
+    Write-Log -Level Verbose "Cannot mine on pool ($Name) - no wallet address specified. "
+    return
+}
 
 $PoolRegions = "eu", "us"
 $PoolAPIStatusUri = "https://ravenminer.com/api/status"
@@ -20,9 +24,9 @@ if (-not $Payout_Currencies) {
 
 $RetryCount = 3
 $RetryDelay = 2
-while (-not ($APIStatusRequest) -and $RetryCount -gt 0) {
+while (-not ($APIStatusResponse) -and $RetryCount -gt 0) {
     try {
-        if (-not $APIStatusRequest) {$APIStatusRequest = Invoke-RestMethod $PoolAPIStatusUri -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop}
+        $APIStatusResponse = Invoke-RestMethod $PoolAPIStatusUri -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
     }
     catch {
         Start-Sleep -Seconds $RetryDelay
@@ -30,28 +34,33 @@ while (-not ($APIStatusRequest) -and $RetryCount -gt 0) {
     $RetryCount--
 }
 
-if (-not $APIStatusRequest) {
+if (-not $APIStatusResponse) {
     Write-Log -Level Warn "Pool API ($Name) has failed. "
     return
 }
 
-if (($APIStatusRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Measure-Object Name).Count -ne 1) {
+if (($APIStatusResponse | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Measure-Object Name).Count -ne 1) {
     Write-Log -Level Warn "Pool API ($Name) [StatusUri] returned invalid data. "
     return
 }
 
-$APIStatusRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Where-Object {$APIStatusRequest.$_.hashrate -gt 0} | ForEach-Object {
+$APIStatusResponse | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Select-Object -ExpandProperty Name | Where-Object {$APIStatusResponse.$_.hashrate -gt 0} | ForEach-Object {
 
     $PoolHost       = "ravenminer.com"
-    $Port           = $APIStatusRequest.$_.port
-    $Algorithm      = $APIStatusRequest.$_.name
+    $Port           = $APIStatusResponse.$_.port
+    $Algorithm      = $APIStatusResponse.$_.name
     $Algorithm_Norm = Get-Algorithm $Algorithm
-    $Workers        = $APIStatusRequest.$_.workers
-    $Fee            = $APIStatusRequest.$_.Fees / 100
+    $Workers        = $APIStatusResponse.$_.workers
+    $Fee            = $APIStatusResponse.$_.Fees / 100
     $Divisor        = 1000000000
 
-    if ((Get-Stat -Name "$($Name)_$($Algorithm_Norm)_Profit") -eq $null) {$Stat = Set-Stat -Name "$($Name)_$($Algorithm_Norm)_Profit" -Value ([Double]$APIStatusRequest.$_.estimate_last24h / $Divisor) -Duration (New-TimeSpan -Days 1)}
-    else {$Stat = Set-Stat -Name "$($Name)_$($Algorithm_Norm)_Profit" -Value ([Double]$APIStatusRequest.$_.estimate_current / $Divisor) -Duration $StatSpan -ChangeDetection $true}
+    if ((Get-Stat -Name "$($Name)_$($Algorithm_Norm)_Profit") -eq $null) {$Stat = Set-Stat -Name "$($Name)_$($Algorithm_Norm)_Profit" -Value ([Double]$APIStatusResponse.$_.estimate_last24h / $Divisor) -Duration (New-TimeSpan -Days 1)}
+    else {$Stat = Set-Stat -Name "$($Name)_$($Algorithm_Norm)_Profit" -Value ([Double]$APIStatusResponse.$_.estimate_current / $Divisor) -Duration $StatSpan -ChangeDetection $true}
+    
+    try {
+        $EstimateCorrection = ($APIStatusResponse.$_.actual_last24h / 1000) / $APIStatusResponse.$_.estimate_last24h
+    }
+    catch {}
 
     $PoolRegions | ForEach-Object {
         $Region = $_
@@ -59,22 +68,23 @@ $APIStatusRequest | Get-Member -MemberType NoteProperty -ErrorAction Ignore | Se
         
         $Payout_Currencies | ForEach-Object {
             [PSCustomObject]@{
-                Algorithm      = $Algorithm_Norm
-                CoinName       = "RavenCoin"
-                Price          = $Stat.Live
-                StablePrice    = $Stat.Week
-                MarginOfError  = $Stat.Week_Fluctuation
-                Protocol       = "stratum+tcp"
-                Host           = "$Region.$PoolHost"
-                Port           = $Port
-                User           = $Config.Pools.$Name.Wallets.$_
-                Pass           = "ID=$($Config.Pools.$Name.Worker),c=$_"
-                Region         = $Region_Norm
-                SSL            = $false
-                Updated        = $Stat.Updated
-                Fee            = $Fee
-                Workers        = [Int]$Workers
-                MiningCurrency = "RVN"
+                Algorithm          = $Algorithm_Norm
+                CoinName           = "RavenCoin"
+                Price              = $Stat.Live
+                StablePrice        = $Stat.Week
+                MarginOfError      = $Stat.Week_Fluctuation
+                Protocol           = "stratum+tcp"
+                Host               = "$Region.$PoolHost"
+                Port               = $Port
+                User               = $Config.Pools.$Name.Wallets.$_
+                Pass               = "ID=$($Config.Pools.$Name.Worker),c=$_"
+                Region             = $Region_Norm
+                SSL                = $false
+                Updated            = $Stat.Updated
+                Fee                = $Fee
+                Workers            = [Int]$Workers
+                MiningCurrency     = "RVN"
+                EstimateCorrection = $EstimateCorrection
             }
         }
     }

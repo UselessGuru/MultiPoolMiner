@@ -6,8 +6,6 @@ try {
 catch {
     Remove-Item .\~OpenCL.dll -Force -ErrorAction Ignore
     Add-Type -Path .\OpenCL\*.cs -OutputAssembly ~OpenCL.dll
-}
-finally {
     Add-Type -Path .\~OpenCL.dll
 }
 
@@ -23,9 +21,8 @@ catch {
         Remove-Item .\~MonoTorrent.dll -Force -ErrorAction Ignore
         Add-Type -Path (".\MonoTorrent\*.cs" | Get-ChildItem -Recurse).FullName -IgnoreWarnings -WarningAction SilentlyContinue -OutputAssembly ~MonoTorrent.dll
     }
-    finally {
-        Add-Type -Path .\~MonoTorrent.dll
-    }
+
+    Add-Type -Path .\~MonoTorrent.dll
 }
 
 try {
@@ -34,8 +31,6 @@ try {
 catch {
     Remove-Item .\~CPUID.dll -Force -ErrorAction Ignore
     Add-Type -Path .\CPUID.cs -OutputAssembly ~CPUID.dll
-}
-finally {
     Add-Type -Path .\~CPUID.dll
 }
 
@@ -330,7 +325,7 @@ function Get-ParameterPerDevice {
                 # supported separators are listed in brackets: [ =]+
                 $ParameterValueSeparator = $Matches[0]
                 $Parameter = $Token -split $ParameterValueSeparator | Select-Object -Index 0
-                $Values = $Token.Substring(("$($Parameter)$($ParameterValueSeparator)").length)
+                $Values = $Token.Substring(("$Parameter$($ParameterValueSeparator)").length)
 
                 if ($Values -match "(?:[,; ]{1})") {
                     # supported separators are listed in brackets: [,; ]{1}
@@ -340,11 +335,11 @@ function Get-ParameterPerDevice {
                         if ($Values.Split($ValueSeparator) | Select-Object -Index $_) {$RelevantValues += ($Values.Split($ValueSeparator) | Select-Object -Index $_)}
                         else {$RelevantValues += ""}
                     }                    
-                    $ParameterPerDevice += "$($Prefix)$($Parameter)$($ParameterValueSeparator)$(($RelevantValues -join $ValueSeparator).TrimEnd($ValueSeparator))"
+                    $ParameterPerDevice += "$Prefix$Parameter$ParameterValueSeparator$(($RelevantValues -join $ValueSeparator).TrimEnd($ValueSeparator))"
                 }
-                else {$ParameterPerDevice += "$($Prefix)$($Parameter)$($ParameterValueSeparator)$($Values)"}
+                else {$ParameterPerDevice += "$Prefix$Parameter$ParameterValueSeparator$Values"}
             }
-            else {$ParameterPerDevice += "$($Prefix)$($Token)"}
+            else {$ParameterPerDevice += "$Prefix$Token"}
         }
         else {$ParameterPerDevice += $Token}
     }
@@ -467,7 +462,7 @@ function Set-Stat {
 
         if ($ChangeDetection -and [Decimal]$Value -eq [Decimal]$Stat.Live) {$Updated = $Stat.updated}
 
-        if (($Value -lt $ToleranceMin -or $Value -gt $ToleranceMax) -and ($Stat.ToleranceExceeded -lt 3)) {
+        if (($Value -lt $ToleranceMin -or $Value -gt $ToleranceMax) -and ($Stat.ToleranceExceeded -lt 3) -and $ToleranceMin) { #Update immediately if stat value is 0
             $Stat.ToleranceExceeded ++
             if ($Name -match ".+_HashRate$") {
                 Write-Log -Level Warn "Stat file ($Name) was not updated because the value ($(($Value | ConvertTo-Hash) -replace '\s+', '')) is outside fault tolerance ($(($ToleranceMin | ConvertTo-Hash) -replace '\s+', ' ') to $(($ToleranceMax | ConvertTo-Hash) -replace '\s+', ' ')) [$($Stat.ToleranceExceeded) of 3 until enforced update]. "
@@ -477,12 +472,14 @@ function Set-Stat {
             }
         }
         else {
-            if ($Stat.ToleranceExceeded -ge 3) {
-                if ($Name -match ".+_HashRate$") {
-                    Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($(($Value | ConvertTo-Hash) -replace '\s+', '')) because it was outside fault tolerance ($(($ToleranceMin | ConvertTo-Hash) -replace '\s+', ' ')) to $(($ToleranceMax | ConvertTo-Hash) -replace '\s+', ' ')) for $($Stat.ToleranceExceeded) times in a row. "
-                }
-                else {
-                    Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($($Value.ToString("N2"))W) because it was outside fault tolerance ($($ToleranceMin.ToString("N2"))W to $($ToleranceMax.ToString("N2"))W) for $($Stat.ToleranceExceeded) times in a row. "
+            if ($Stat.ToleranceExceeded -ge 3 -or (-not $ToleranceMin)) { #Update immediately if stat value is 0
+                if ($ToleranceMin) {
+                    if ($Name -match ".+_HashRate$") {
+                        Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($(($Value | ConvertTo-Hash) -replace '\s+', '')) because it was outside fault tolerance ($(($ToleranceMin | ConvertTo-Hash) -replace '\s+', ' ')) to $(($ToleranceMax | ConvertTo-Hash) -replace '\s+', ' ')) for $($Stat.ToleranceExceeded) times in a row. "
+                    }
+                    else {
+                        Write-Log -Level Warn "Stat file ($Name) was forcefully updated with value ($($Value.ToString("N2"))W) because it was outside fault tolerance ($($ToleranceMin.ToString("N2"))W to $($ToleranceMax.ToString("N2"))W) for $($Stat.ToleranceExceeded) times in a row. "
+                    }
                 }
                 $Stat = [PSCustomObject]@{
                     Live                  = $Value
@@ -633,8 +630,9 @@ function Get-ChildItemContent {
         [Parameter(Mandatory = $false)]
         [Switch]$Threaded = $false
     )
+    if ($Parameters.JobName) {$JobName = $Parameters.JobName} else {$JobName = "JobName"}
 
-    $Job = Start-ThreadJob -InitializationScript ([scriptblock]::Create("Set-Location('$(Get-Location)')")) -Name $Parameters.JobName -ScriptBlock {
+    $Job = Start-Job -InitializationScript ([scriptblock]::Create("Set-Location('$(Get-Location)')")) -Name $JobName -ScriptBlock {
         param(
             [Parameter(Mandatory = $true)]
             [String]$Path, 
@@ -642,7 +640,7 @@ function Get-ChildItemContent {
             [Hashtable]$Parameters = @{}
         )
 
-        ([System.Diagnostics.Process]::GetCurrentProcess()).PriorityClass = 'BelowNormal'
+        if (-not (Get-Module -Name "ThreadJob")) {([System.Diagnostics.Process]::GetCurrentProcess()).PriorityClass = 'BelowNormal'}
 
         function Invoke-ExpressionRecursive ($Expression) {
             if ($Expression -is [String]) {
@@ -693,64 +691,6 @@ function Get-ChildItemContent {
 
     if ($Threaded) {$Job}
     else {$Job | Receive-Job -Wait -AutoRemoveJob}
-}
-
-function Get-ChildItemContent2 {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [String]$Path, 
-        [Parameter(Mandatory = $false)]
-        [Hashtable]$Parameters = @{}, 
-        [Parameter(Mandatory = $false)]
-        [Switch]$Threaded = $false
-    )
-
-    function Invoke-ExpressionRecursive ($Expression) {
-        if ($Expression -is [String]) {
-            if ($Expression -match '^\$[A-Za-z]') {
-                try {$Expression = Invoke-Expression $Expression}
-                catch {$Expression = Invoke-Expression "`"$Expression`""} 
-            }
-        }
-        elseif ($Expression -is [PSCustomObject]) {
-            $Expression | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name | ForEach-Object {
-                $Expression.$_ = Invoke-ExpressionRecursive $Expression.$_
-            }
-        }
-        return $Expression
-    }
-
-    Get-ChildItem $Path -File -ErrorAction SilentlyContinue | ForEach-Object {
-        $Name = $_.BaseName
-        $Content = @()
-        if ($_.Extension -eq ".ps1") {
-            $Content = & {
-                $Parameters.Keys | ForEach-Object {Set-Variable $_ $Parameters.$_}
-                & $_.FullName @Parameters
-            }
-        }
-        else {
-            $Content = & {
-                $Parameters.Keys | ForEach-Object {Set-Variable $_ $Parameters.$_}
-                try {
-                    ($_ | Get-Content | ConvertFrom-Json) | ForEach-Object {Invoke-ExpressionRecursive $_}
-                }
-                catch [ArgumentException] {
-                    $null
-                }
-            }
-            if ($null -eq $Content) {$Content = $_ | Get-Content}
-        }
-        $Content | ForEach-Object {
-            if ($_.Name) {
-                [PSCustomObject]@{Name = $_.Name; Content = $_}
-            }
-            else {
-                [PSCustomObject]@{Name = $Name; Content = $_}
-            }
-        }
-    }
 }
 
 function Get-MinerVersion {
@@ -1051,32 +991,6 @@ function Get-Device {
         [Switch]$Refresh = $false
     )
 
-    Function Get-BusFunctionID { 
-
-        #gwmi -query "SELECT * FROM Win32_PnPEntity"
-        Get-WMIObject -Namespace root\cimv2 -Class Win32_PnPEntity | ForEach-Object {
-
-            if ($_.PNPDeviceID -like "PCI\*") {
-
-                $DeviceId = $_.PNPDeviceID
-                $LocationInfo = (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Enum\$DeviceID" -Name locationinformation).locationInformation
-
-                if ($LocationInfo -match  "\d+,\d+,\d+") {
-                    $BusId, $DeviceID, $FunctionID = $matches[0] -split ","
-
-                    [PSCustomObject]@{  
-                        "Name"       = $_.Name
-                        "PnPClass"   = $_.PNPClass
-                        "PnPID"      = $_.PNPDeviceID
-                        "BusID"      = $BusId
-                        "DeviceID"   = $DeviceID
-                        "FunctionID" = $FunctionID
-                    }
-                }
-            }
-        }
-    } 
-
     if ($Name) {
         $DeviceList = Get-Content "Devices.txt" | ConvertFrom-Json
         $Name_Devices = $Name | ForEach-Object {
@@ -1298,9 +1212,11 @@ function Get-Region {
     else {$Region}
 }
 
-function Get-EquihashPers {
+function Get-AlgoCoinPers {
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory = $true)]
+        [String]$Algorithm = "",
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [String]$CoinName = "",
@@ -1309,11 +1225,11 @@ function Get-EquihashPers {
         [String]$Default = ""
     )
 
-    if (-not (Test-Path Variable:Script:EquihashPers -ErrorAction SilentlyContinue)) {
-        $Script:EquihashPers = Get-Content "EquihashPers.txt" | ConvertFrom-Json
+    if (-not (Test-Path Variable:Script:AlgoCoinPers -ErrorAction SilentlyContinue)) {
+        $Script:AlgoCoinPers = Get-Content "AlgoCoinPers.txt" | ConvertFrom-Json
     }
     
-    if ($Script:EquihashPers.$CoinName) {$Script:EquihashPers.$CoinName}
+    if ($Script:AlgoCoinPers.$Algorithm.$CoinName) {$Script:AlgoCoinPers.$Algorithm.$CoinName}
     else {$Default}
 }
 
