@@ -1,4 +1,4 @@
-MultiPoolMiner dev versions
+MultiPoolMiner dev versions of
 https://github.com/MultiPoolMiner/MultiPoolMiner
 
 Download link:
