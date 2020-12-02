@@ -10,7 +10,7 @@ Please also report if all is working fine - only so I can know that we get rid o
 
 ## Core changes
 - Added config parameter '-DisableEstimateCorrection'; reduce the algo price by a correction factor (actual_last24h / estimate_last24h) to counter pool overestimated prices
-- Changed funtion Get-EquihasPers to Get-AlgoCoinPers & EquihashPers.txt to AlgoCoinPers.txt
+- Changed functions Get-EquihasPers to Get-AlgoCoinPers & EquihashPers.txt to AlgoCoinPers.txt
 - List pool names being queried for pricing information
 - Use only configured devices when API becomes available
 - Workround when module 'ThreadJob' cannot be loaded: use normal 'Start-Job'
